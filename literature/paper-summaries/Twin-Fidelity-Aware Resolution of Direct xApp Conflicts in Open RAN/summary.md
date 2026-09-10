@@ -20,7 +20,10 @@
 * **Digital Twins & Runtime Assurance:** Focuses on NDT frameworks for testing/assurance, safety verification layers (Safety Copilot), traffic analytics realignment (AIDITA), and MARL-driven IoT management.
 
 
-* **Key Gap Addressed:** Prior works either assume the digital twin/learned model remains accurate during runtime, focus on static QoS satisfaction, or require complex offline joint retraining. A lightweight, training-free arbiter that explicitly handles NDT drift during direct conflict resolution was lacking.
+
+### **Key Gap Addressed**
+
+Prior works either assume the digital twin/learned model remains accurate during runtime, focus on static QoS satisfaction, or require complex offline joint retraining. A lightweight, training-free arbiter that explicitly handles NDT drift during direct conflict resolution was lacking.
 
 
 
