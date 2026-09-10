@@ -1,6 +1,6 @@
-### Summary of COMIX: Generalized Conflict Management in O-RAN xApps
+# Summary of COMIX: Generalized Conflict Management in O-RAN xApps
 
-#### 1. Problem
+## 1. Problem
 
 * **xApp Objective Conflicts:** Concurrent operation of multiple independent xApps targeting the same underlying RAN nodes (RUs) with conflicting goals (e.g., maximizing data rate vs. minimizing energy consumption) leads to network instability, suboptimal performance, and increased interference.
 
@@ -11,9 +11,9 @@
 
 ---
 
-#### 2. What Already Existed and the Gap Addressed
+## 2. What Already Existed and the Gap Addressed
 
-* **What Existed:**
+### What Existed:
 * Standard O-RAN Alliance Conflict Mitigation Framework (CMF) architectural guidelines.
 
 
@@ -22,7 +22,7 @@
 
 
 
-* **Gap Addressed:**
+### Gap Addressed:
 * Existing literature lacked concrete use-case validations and quantitative performance comparisons under realistic network conditions.
 
 
@@ -34,7 +34,7 @@
 
 ---
 
-#### 3. Approach
+## 3. Approach
 
 * **COMIX Framework Integration:** Integrates a CMF component into the Near-RT RIC along with a Network Digital Twin (NDT).
 
@@ -74,7 +74,7 @@
 
 ---
 
-#### 4. Results
+## 4. Results
 
 * **Energy Savings:** CMF-backed resolution policies (MinPS, EES, TVS, EEVS) achieved substantial power consumption reductions compared to baseline, CMF-free setups (which overwrite parameters based on arrival time).
 
@@ -88,7 +88,7 @@
 
 ---
 
-#### 5. Conclusion
+## 5. Conclusion
 
 * COMIX demonstrates that combining proactive conflict classification with NDT pre-execution scoring successfully resolves direct xApp conflicts in multi-channel power control scenarios.
 
