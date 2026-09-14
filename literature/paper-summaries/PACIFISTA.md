@@ -37,12 +37,48 @@ graph LR
 
 ```
 
+**Application Profiling**
 
-* **Application Profiling**: Runs in sandbox testing environments (digital twins, emulation), recording operational conditions (channel conditions, traffic demand, mobility, node location) and extracting Empirical Cumulative Density Functions (ECDFs) for control parameters and KPMs [cite: 1].
-* **Graph-Based Classification**: Combines hierarchical graphs with statistical behavior to classify conflicts into direct, parameter conflicts (e.g., rApp powers off base station while xApp adjusts transmission power), and KPM conflicts [cite: 1].
-* **Statistical Evaluation Pipeline**: Uses Kolmogorov-Smirnov (K-S), Integral Area (INT), and Chi-Square distance metrics on ECDFs (unitless in $$) rather than raw data logs during evaluation.
-* **Threshold-Based Mitigation**: SMO applies conflict tolerance $\delta_{\text{TOL}} \in$ and per-application priority indexes $I_a$ to block high-conflict deployments or remove subset applications [cite: 1].
+* **Operational Condition Scope**: Profiles are generated offline by executing sandbox testing (digital twins, emulation) per operational condition $c \in C$, recording wireless environment characteristics, traffic demand, mobility, and node location [cite: 1].
+* **Multi-App Virtual Aggregation**: When concurrent tests involve multiple applications ($a_1, a_2$), they are treated as a "virtual" application $a$ controlling $\mathcal{P}_a = \mathcal{P}_{a_1} \cup \mathcal{P}_{a_2}$ [cite: 1].
+* **Statistical Extraction**: Raw data from interfaces (O1 for rApps, E2 for xApps, direct for dApps) is processed into Empirical Cumulative Density Functions (ECDFs) for parameters $\mathcal{P}$ and KPMs $\mathcal{K}$, which form the application profile stored in the catalog [cite: 1].
 
+---
+
+**Graph Structure Creation (GSC Module)**
+
+* **Algorithm Inputs & Outputs**:
+* Input sets: $\text{Apps } A = \{a_1, \dots, a_n\}$, Parameters $\mathcal{P} = \{p_1, \dots, p_m\}$, KPMs $\mathcal{K} = \{k_1, \dots, k_l\}$, number of events $N$ [cite: 3].
+* Output dictionaries: $\mathcal{D}_{AP}^{(i)}, \mathcal{D}_{KP}^{(i)}, \mathcal{D}_{P'P}^{(i)}$, Dataset $\{B_t^{(i)}\}$ [cite: 3].
+
+
+* **Binary-State Transformation**: Ingests high-dimensional multivariate time-series data, checking value variation from previous timestamp to update binary states ($0$ or $1$) [cite: 3].
+* **Subgraph Construction & Categorization**: Event-driven construction linking nodes whose states change simultaneously across three groups [cite: 3]:
+* **Group $G^{AP}$**: Links xApp states and parameter states ($s_{aj} \text{ and } s_{pj} == 1$) to model joint application-level behavior [cite: 3].
+* **Group $G^{P'P}$**: Links simultaneous controllable parameter state changes to isolate parameter dynamics [cite: 3].
+* **Group $G^{KP}$**: Links parameter states and KPM states ($s_{pj} \text{ and } s_{kj} == 1$) to reveal performance impact [cite: 3].
+
+
+* **Graph Integration**: Individual subgraphs are combined into a unified graph-structured data representation per test data point [cite: 3]. (*Note: Explicit mathematical formulas for edge weighting/message passing are not defined in the source text.*)
+
+---
+
+**Conflict Evaluation**
+
+* **Pairwise Selection & Extraction**:
+* Select two applications $a', a''$, retrieve profiles, and choose operational condition $c \in C$ [cite: 1].
+* For each parameter pair $p \in \mathcal{P}_{a'} \times \mathcal{P}_{a''}$, extract distance metrics $\mathbf{D}_{a', a''}^f(\mathcal{P}, c)$ and $\mathbf{D}_{a', a''}^f(\mathcal{K}, c)$ [cite: 1].
+
+
+* **Distance Functions (Table 1)**: All metric values map to $$ [cite: 1]:
+* **K-S (Kolmogorov-Smirnov)**: $\max \vert{}F_1(x) - F_2(x)\vert{}$ (maximum vertical distance between two ECDFs) [cite: 1].
+* **INT (Integral Area)**: $\sqrt{\frac{1}{L} \int \vert{}F_1(x) - F_2(x)\vert{}}$ (integral of absolute distance between two ECDFs, with $L = \max(x) - \min(x)$) [cite: 1].
+* **$\chi^2$ (Chi-Square)**: $1 - \text{p-value}$ (likelihood that data from two categorical distributions differ) [cite: 1].
+
+
+* **Severity Index Aggregation**:
+* For an application set $A^*$ of cardinality $A^*$, total conflict pairs = $A^*(A^* - 1)/2$ [cite: 1].
+* Computes severity indexes $\sigma_{a', a''}^P(\mathcal{P}^* \vert{} c)$ and $\sigma_{a', a''}^K(\mathcal{K}^* \vert{} c)$ by aggregating distances $D_{a', a''}^f(z \vert{} c)$ for variables $z \in \mathcal{P}^*$ or $z \in \mathcal{K}^*$ under condition $c$ using combining function $H(\cdot)$ [cite: 1].
 ---
 
 ### **5. Results**
