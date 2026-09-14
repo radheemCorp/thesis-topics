@@ -1,11 +1,3 @@
-```text
-Pointer:
-- All information should remain grounded in the paper's/summary's content.
-- Avoid introducing new information or making assumptions not present in the paper/summary.
-- Convert ASCII diagrams to mermaid diagrams
-- Make sure markdown tables are properly formatted and rendered.
-```
-
 ### **1. Problem**
 
 Open RAN (O-RAN) enables multi-vendor interoperability and data-driven control, but independently pre-trained xApps deployed in the Near-RT RIC may issue **conflicting control decisions**. Although the O-RAN architecture mandates offline training and validation before deployment, dynamic network conditions can still precipitate operational conflicts.

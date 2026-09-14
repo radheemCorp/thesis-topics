@@ -1,11 +1,3 @@
-```text
-Pointer:
-- All information should remain grounded in the paper's/summary's content.
-- Avoid introducing new information or making assumptions not present in the paper/summary.
-- Convert ASCII diagrams to mermaid diagrams
-- Make sure markdown tables are properly formatted and rendered.
-```
-
 ### **1. Problem**
 
 In Open RAN, multiple independently developed **xApps** from different vendors are deployed in the Near-RT-RIC to optimize network objectives (e.g., energy saving, mobility robustness, load balancing). Because these xApps share network resources and control parameters, they produce **control decision conflicts** that degrade RAN KPIs. The paper identifies three types of intra-component conflicts:

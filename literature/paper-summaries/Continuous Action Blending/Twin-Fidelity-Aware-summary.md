@@ -1,11 +1,3 @@
-```text
-Pointer:
-- All information should remain grounded in the paper's/summary's content.
-- Avoid introducing new information or making assumptions not present in the paper/summary.
-- Convert ASCII diagrams to mermaid diagrams
-- Make sure markdown tables are properly formatted and rendered.
-```
-
 ### **1. Problem**
 
 In Open RAN, independently developed xApps in the Near-RT-RIC may issue incompatible control actions for the same RAN parameter. This paper addresses a **direct conflict** where an energy-saving (ES) xApp and a coverage/throughput-oriented (CTO) xApp simultaneously control a cell's downlink transmit power — the ES xApp requests lower power to reduce energy consumption, while the CTO xApp requests higher power to improve coverage and throughput.

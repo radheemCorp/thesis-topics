@@ -1,11 +1,3 @@
-```text
-Pointer:
-- All information should remain grounded in the paper's/summary's content.
-- Avoid introducing new information or making assumptions not present in the paper/summary.
-- Convert ASCII diagrams to mermaid diagrams
-- Make sure markdown tables are properly formatted and rendered.
-```
-
 ### **1. Problem**
 
 In O-RAN architectures, multiple independently managed **xApps** (eXtended Applications) run on the Near-RT RIC, each with distinct optimization objectives (e.g., load balancing, interference management, handover optimization). Because these xApps share network resources and control parameters, their autonomous operation creates three types of conflicts:
