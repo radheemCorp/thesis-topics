@@ -29,7 +29,3 @@
 * **V2X Management xApp:** Optimizes radio resource allocation and handover policies specifically for Vehicle-to-Everything (V2X) communication scenarios.
 * **Distilled / Student xApps:** Multi-headed controllers trained by distilling knowledge from multiple pre-trained "teacher" xApps (e.g., combining Handover + RB Allocation and Handover + Power Control into a single xApp).
 * **Deterministic Baseline xApps:** Reference xApps (such as Equal Power Allocation and Equal RBG Distribution) integrated alongside machine learning xApps in context-aware scheduling frameworks.
-
----
-
-💡 Would you like to analyze a specific conflict pair from these sources (e.g., **MRO vs. MLB** or **ES vs. CCO**) and compare how different mitigation frameworks resolve their parameter clashes?
