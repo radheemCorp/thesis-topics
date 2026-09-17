@@ -1,3 +1,7 @@
+Here is a comprehensive summary of the paper **"Conflict Management in the Near-RT-RIC of Open RAN: A Game Theoretic Approach"** (Wadud et al.) and its accompanying repository.
+
+---
+
 ### **1. Problem**
 
 * **Disaggregated Multi-Vendor Architecture**: Open Radio Access Network (Open RAN) disaggregates traditional monolithic RAN components into open, virtualized, software-defined stacks managed by intelligent control applications (xApps and rApps) from multiple external vendors.
@@ -117,13 +121,13 @@ flowchart TD
 
 4. **Conflict Mitigation Controller (CMC) & Game-Theoretic Bargaining**:
    * **Closed-Loop Bargaining**: CMC communicates with involved xApps over Channel 2 to request KPI bounds, parameter operating ranges, and priority weights.
-   * **Utility Normalization**: Converts raw KPIs (with different units) onto a uniform scale of \(\) (or \(\) in evaluations) using min-max normalization:
-     $$f_i(x) = u_i = \frac{1}{|J|} \sum_{j \in [1, |J|]} \left( \frac{o_{ij} - o_{ij}^{\min}}{o_{ij}^{\max} - o_{ij}^{\min}} \times 10 \right)$$
+   * **Utility Normalization**: Converts raw KPIs (with different units) onto a uniform scale of \\(\\) (or \\(\\) in evaluations) using min-max normalization:
+     \\[f_i(x) = u_i = \frac{1}{|J|} \sum_{j \in [1, |J|]} \left( \frac{o_{ij} - o_{ij}^{\min}}{o_{ij}^{\max} - o_{ij}^{\min}} \times 10 \right)\\]
    * **Non-Priority Scenario — Nash Social Welfare Function (NSWF)**:
      Calculates the product of individual xApp utilities to maximize collective system satisfaction and balance fairness with efficiency:
-     $$\text{NSWF}(x) = \prod_{i \in [1, |Z|]} f_i(x), \quad \forall i \in Z$$
+     \\[\text{NSWF}(x) = \prod_{i \in [1, |Z|]} f_i(x), \quad \forall i \in Z\\]
    * **Priority Scenario — Eisenberg-Galle (EG) Convex Linear Program**:
-     Incorporates operator-assigned priority weights (\(w_i\), where \(\sum w_i = 1\)) to prioritize critical xApps (e.g., MRO during call drop spikes) while still computing a compromise setting for lower-priority apps:
+     Incorporates operator-assigned priority weights (\\(w_i\\), where \\(\sum w_i = 1\\)) to prioritize critical xApps (e.g., MRO during call drop spikes) while still computing a compromise setting for lower-priority apps:
      $$\max : F = \sum_{i \in [1, |s|]} w_i f_i(x) \quad \text{s.t. } \sum_{i \in [1, |Z|]} w_i = 1, \quad p_{\min, \text{opt}}^m \le x \le p_{\max, \text{opt}}^m$$
 
 ```mermaid
@@ -151,14 +155,14 @@ sequenceDiagram
 ### **5. Results**
 
 #### **Experimental Model & Setup**:
-* **xApps Evaluated**: Mobility Load Balancing (\(\text{xApp}_1\)), Capacity and Coverage Optimization (\(\text{xApp}_2\)), Energy Saving (\(\text{xApp}_3\)), and Mobility Robustness Optimization (\(\text{xApp}_4\)).
-* **Shared Parameter**: Transmission Power (\(p_1\) / TxP) evaluated across range \([-150, 150]\).
-* **Non-Conflicting Parameters**: Configured as \(p_2 = 20, p_3 = 60, p_4 \in [-100, 100], p_5 = 60, p_6 \in [-50, 150], p_7 = 60\).
+* **xApps Evaluated**: Mobility Load Balancing (\\(\text{xApp}_1\\)), Capacity and Coverage Optimization (\\(\text{xApp}_2\\)), Energy Saving (\\(\text{xApp}_3\\)), and Mobility Robustness Optimization (\\(\text{xApp}_4\\)).
+* **Shared Parameter**: Transmission Power (\\(p_1\\) / TxP) evaluated across range \\([-150, 150]\\).
+* **Non-Conflicting Parameters**: Configured as \\(p_2 = 20, p_3 = 60, p_4 \in [-100, 100], p_5 = 60, p_6 \in [-50, 150], p_7 = 60\\).
 * **Machine Learning Representation**: Intelligent xApps modeled using Polynomial Regression Blocks in Python, trained on synthetic datasets (`data1.csv` to `data4.csv` generated via Gaussian KPI distribution functions).
 * **Priority Weights**: Assigned by Mobile Network Operator (MNO) as:
-  * Direct Conflict: \(\{\text{xApp}_1 = 0.4, \text{xApp}_2 = 0.6\}\).
-  * Indirect Conflict: \(\{\text{xApp}_2 = 0.1, \text{xApp}_4 = 0.9\}\).
-  * Implicit Conflict: \(\{\text{xApp}_1 = 0.9, \text{xApp}_3 = 0.1\}\).
+  * Direct Conflict: \\(\{\text{xApp}_1 = 0.4, \text{xApp}_2 = 0.6\}\\).
+  * Indirect Conflict: \\(\{\text{xApp}_2 = 0.1, \text{xApp}_4 = 0.9\}\\).
+  * Implicit Conflict: \\(\{\text{xApp}_1 = 0.9, \text{xApp}_3 = 0.1\}\\).
 
 ```mermaid
 flowchart LR
@@ -173,9 +177,9 @@ flowchart LR
 
 | Conflict Scenario | Initial Unmitigated State & Clashes | Arithmetic Mean (AM) Result | NSWF Result (Non-Priority) | Eisenberg-Galle (EG) Result (Priority) |
 | :--- | :--- | :--- | :--- | :--- |
-| **Direct Conflict**<br>($\text{xApp}_1$ vs. $\text{xApp}_2$) | $\text{xApp}_1$ demands $p_1 = -50$ ($u_1 = 0.5, u_2 = 0.25$); $\text{xApp}_2$ demands $p_1 = 50$ ($u_2 = 1.0, u_1 = 0.0$). | Suggests $p_1 = 0$; yields $u_1 \approx 0.02, u_2 \approx 0.72$. | Suggests $p_1 = -18$; maximizes collective utility across both xApps without favoring either. | Suggests $p_1 = 22$; prioritizes $\text{xApp}_2$ per MNO weight ($0.6$ vs $0.4$). |
-| **Indirect Conflict**<br>($\text{xApp}_2$ vs. $\text{xApp}_4$) | $\text{xApp}_2$ sets $p_1 = 0$ at $t_2$, indirectly collapsing $\text{xApp}_4$ utility near zero. | Suggests $p_1 = 12$; fails to improve $\text{xApp}_4$ utility. | Suggests $p_1 = 66$; significantly enhances collective utility for both xApps. | Suggests $p_1 = 110$; substantially increases $\text{xApp}_4$ utility when prioritized by MNO ($w = 0.9$). |
-| **Implicit Conflict**<br>($\text{xApp}_1$ vs. $\text{xApp}_3$) | $\text{xApp}_1$ sets $p_1 = -85$ at $t'_2$, causing implicit drop in $\text{xApp}_3$ utility below $0.4$. | Suggests $p_1 = -84$; provides minimal improvement for $\text{xApp}_3$. | Suggests $p_1 = -62$; restores $\text{xApp}_3$ utility while balancing $\text{xApp}_1$. | Suggests $p_1 = -75$; maintains higher utility for $\text{xApp}_1$ when prioritized ($w = 0.9$). |
+| **Direct Conflict**<br>(\\(\text{xApp}_1\\) vs. \\(\text{xApp}_2\\)) | \\(\text{xApp}_1\\) demands \\(p_1 = -50\\) (\\(u_1 = 0.5, u_2 = 0.25\\)); \\(\text{xApp}_2\\) demands \\(p_1 = 50\\) (\\(u_2 = 1.0, u_1 = 0.0\\)). | Suggests \\(p_1 = 0\\); yields \\(u_1 \approx 0.02, u_2 \approx 0.72\\). | Suggests \\(p_1 = -18\\); maximizes collective utility across both xApps without favoring either. | Suggests \\(p_1 = 22\\); prioritizes \\(\text{xApp}_2\\) per MNO weight (\\(0.6\\) vs \\(0.4\\)). |
+| **Indirect Conflict**<br>(\\(\text{xApp}_2\\) vs. \\(\text{xApp}_4\\)) | \\(\text{xApp}_2\\) sets \\(p_1 = 0\\) at \\(t_2\\), indirectly collapsing \\(\text{xApp}_4\\) utility near zero. | Suggests \\(p_1 = 12\\); fails to improve \\(\text{xApp}_4\\) utility. | Suggests \\(p_1 = 66\\); significantly enhances collective utility for both xApps. | Suggests \\(p_1 = 110\\); substantially increases \\(\text{xApp}_4\\) utility when prioritized by MNO (\\(w = 0.9\\)). |
+| **Implicit Conflict**<br>(\\(\text{xApp}_1\\) vs. \\(\text{xApp}_3\\)) | \\(\text{xApp}_1\\) sets \\(p_1 = -85\\) at \\(t'_2\\), causing implicit drop in \\(\text{xApp}_3\\) utility below \\(0.4\\). | Suggests \\(p_1 = -84\\); provides minimal improvement for \\(\text{xApp}_3\\). | Suggests \\(p_1 = -62\\); restores \\(\text{xApp}_3\\) utility while balancing \\(\text{xApp}_1\\). | Suggests \\(p_1 = -75\\); maintains higher utility for \\(\text{xApp}_1\\) when prioritized (\\(w = 0.9\\)). |
 
 ---
 
@@ -184,8 +188,11 @@ flowchart LR
 * **Vendor-Agnostic Conflict Management**: Demonstrates an independent, game-theory-based CMS architecture for Near-RT-RIC that effectively detects and resolves multi-vendor xApp conflicts without requiring xApps to exchange private information.
 * **Balanced Utility Optimization**: Proves that cooperative bargaining (NSWF for equal priority and EG convex optimization for MNO-weighted priority) achieves optimal parameter configurations that outperform traditional arithmetic averaging and binary overrides.
 * **Limitations & Challenges**:
-  * **Computational Latency**: As the density of xApps and ICPs grows, the iterative bargaining loops increase computational complexity, which may exceed the Near-RT-RIC time threshold (\(10\text{ ms}\) to \(1\text{ s}\)).
+  * **Computational Latency**: As the density of xApps and ICPs grows, the iterative bargaining loops increase computational complexity, which may exceed the Near-RT-RIC time threshold (\\(10\text{ ms}\\) to \\(1\text{ s}\\)).
   * **Utility Mapping Difficulty**: Transforming complex, multi-unit real-world KPIs into scalar utility functions remains challenging.
   * **Theoretical Evaluation**: The framework was validated on an experimental Gaussian model and requires real-world testbed verification.
 * **Future Work**: Plans to transition the CMS to real-world Open RAN testbeds, reduce bargaining complexity, explore machine learning for conflict prediction, and employ Multi-Agent Reinforcement Learning (MARL) for automated conflict mitigation.
 
+---
+
+💡 **Next Step:** Would you like to explore how this game-theoretic bargaining approach compares to QoS-Aware Constraint Projection (QACM) or digital twin continuous action blending?
