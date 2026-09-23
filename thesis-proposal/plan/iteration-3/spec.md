@@ -247,6 +247,7 @@ The experiment answers the repository's central question: *how can independently
 - **Open decision (QACM fallback, Q1):** the QACM formulation always returns a compromise $\mathbf{p}^{opt}$ (bounded search), so no infeasibility branch exists in the paper or flowchart. Neither specifies a fallback when the best compromise still leaves some/all xApps below their QoS thresholds ($s_i = 0$). The experiment must define one — candidates: (a) dispatch anyway and log the shortfall, (b) reject the action and keep the previous parameter values, (c) escalate to the CS xApp / MNO policy. This is a fair comparison point against the A2C scheduler's confidence-gated fallback.
 - **Scenario mapping (Q2):** Proposal B — the A2C scenario is the common scenario; QACM is extended to joint-parameter bargaining. The QACM-side extensions are accepted and reported.
 - **A2C reward (Q3):** moot under Proposal B — the native reward $\tau_e$ is used.
+- **Additional open decisions (Q4–Q11, see `open-questions.md`):** QoS thresholds for the A2C scenario (Q4); RBG scalarization and enforcement (Q5); QACM joint-parameter optimization formulation (Q6); Power xApp control granularity (Q7); context-conditioned ANN training data and leakage (Q8); testbed scenario parameter selection (Q9); leftover-bits derivation (Q10); A2C training location (Q11).
 
 ---
 
