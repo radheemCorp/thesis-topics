@@ -211,6 +211,7 @@ The experiment answers the repository's central question: *how can independently
 - xApps are immutable after training (O-RAN WG2 requirement); only the scheduler / CMC adapt.
 - The controllable NCP surface is limited by ns-O-RAN's E2SM-RC implementation; the concrete conflicting parameter must be verified during Phase 1 (candidate: PRB allocation quota; TXP/RET/CIO only if supported).
 - QACM's KPI prediction assumes the ANN generalizes to live conditions; drift handling is out of scope for the core comparison but noted as a limitation.
+- **Open decision (QACM fallback):** the QACM formulation always returns a compromise $p_l^{opt}$ (bounded search over $[p_{min,opt}, p_{max,opt}]$), so no infeasibility branch exists in the paper or flowchart. Neither specifies a fallback when the best compromise still leaves some/all xApps below their QoS thresholds ($s_i = 0$). The experiment must define one — candidates: (a) dispatch anyway and log the shortfall (paper's implicit "as close as possible"), (b) reject the action and keep the previous parameter value, (c) escalate to the CS xApp / MNO policy. This is a fair comparison point against the A2C scheduler's confidence-gated fallback.
 - The A2C scheduler optimizes a single intent (maximize $\tau_e$) in the baseline experiment.
 
 ---

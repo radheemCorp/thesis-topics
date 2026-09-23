@@ -180,5 +180,6 @@ Phase 0 ──► Phase 1 ──► Phase 2 ──► Phase 3 ──► Phase 5 
 | A2C training time ($10^5$ episodes) too long | Medium | Medium | Reduce episodes for scheduler (paper uses same order); parallelize; CPU-optimized env |
 | Leftover-bit metric unavailable | Medium | Medium | Derive from $R_{u,t}$ vs. offered load; or add ns-3 trace source |
 | ANN KPI prediction drift under dynamic conditions | High | Medium | Report as limitation; evaluate prediction error on held-out scenarios |
+| QACM has no defined fallback when the best compromise satisfies zero QoS thresholds | Medium | Medium | Decide in Phase 4 (dispatch-and-log / reject-and-keep-previous / escalate to CS xApp); compare against A2C's confidence-gated fallback |
 | Reproducing paper numbers exactly | Medium | Low | Target qualitative ordering (M2 ≥ M1 > conflicting; QACM > NSWF/EG), not exact values |
 | Near-RT RIC integration complexity | Medium | Medium | Containerized components; incremental bring-up in Phase 0 |
