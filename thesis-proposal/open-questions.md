@@ -69,28 +69,74 @@ For an apples-to-apples comparison, both paradigms must run on the **same** scen
 5. **Method 1/2 semantics** — "retain previous action" and baseline extension were designed for the power+RBG case; baseline TXP policies (e.g., fixed mid-range) are an extra design decision not in the paper.
 6. **Context mismatch** — the QACM scenario has UEs at 0–5 m/s and no explicit arrival rate; the A2C context (arrival rate, speed) must be re-derived or the scenario extended.
 
-### Proposal: map the QACM scenario as the common scenario
+### Proposal A (iter-2): QACM scenario as the common scenario
 
-Mapping the **QACM scenario** (ES vs. CCO over TXP) as the shared scenario is the better direction, because the reverse (mapping the A2C scenario onto QACM) is worse:
+Mapping the **QACM scenario** (ES vs. CCO over TXP) as the shared scenario, with the A2C scheduler adapted to arbitrate the direct TXP conflict.
 
+**Rationale:**
 - QACM's machinery (z-score utility curves over a scalar range, single-parameter optimization) fits **TXP** perfectly — TXP is a scalar NCP.
 - The A2C scenario's RBG allocation is a **combinatorial assignment**, not a scalar parameter; QACM's scalar bargaining cannot express it naturally.
 - The A2C scenario has **two NCPs** (TXP + RBG allocation); QACM optimizes a single $p_l$ per conflict.
 - The A2C scheduler *can* be adapted to the direct TXP conflict (with the complications above), whereas QACM cannot be adapted to the RBG-allocation conflict without a fundamental redesign.
 
-**Consequence:** the A2C scheduler must be extended to arbitrate a direct conflict over TXP (activation mask over {ES, CCO} + baselines, multi-objective reward). The complications in the previous section are accepted as the cost of a fair comparison and should be reported as such in the thesis.
+**Tradeoffs:**
+
+| Pro | Con |
+| :--- | :--- |
+| QACM runs exactly as published (single-parameter bargaining, native objective, 15/16 dBm reference reproducible) | A2C is modified: reward redesign (Q3), conflict-type extension, discrete selector cannot express a continuous compromise |
+| Single scalar NCP keeps the comparison simple | Method 1/2 semantics distorted; baseline TXP policies are an extra design decision |
+| | Opposing xApp objectives diverge from the A2C paper's setup |
+| | Context must be re-derived (QACM scenario has no context dimension) |
+
+### Proposal B (iter-3): A2C scenario as the common scenario (QACM extended to joint-parameter bargaining)
+
+Keeping the **A2C scenario** (Power xApp $X_1$ + RBG xApp $X_2$, indirect conflict over TXP and RBG allocation) as the shared scenario, with QACM extended to bargain over the **joint control vector** $\mathbf{p} = [p_{power}, p_{RBG}]$.
+
+**Rationale:**
+- A2C runs exactly as published: native reward (normalized rate $\tau_e$), Method 1/2 semantics, activation masks, pre-trained immutable xApps.
+- QACM's framework is explicitly designed for direct/indirect/implicit conflicts (2405.07324v2:103, 204, 242) and its §VII-C case study evaluates indirect conflicts (2405.07324v2:356) — the two-NCP indirect conflict is within its design intent.
+- Context $c^\dagger = [d, v]$ is passed into QACM's ANN as features alongside candidate parameter settings, so both paradigms are context-aware.
+- The macro-vs-micro asymmetry (activation scheduling vs. parameter bargaining) becomes the intended comparison dimension, not a distortion.
+
+**Required QACM extensions (beyond the paper):**
+1. **Joint-parameter bargaining** — the paper's exact solver is formulated for a single NCP ($4|X'|$ vars, $4|X'|+2|N|+3$ constraints); the §VII-C indirect case study is still single-parameter ($p_2$). Bargaining over $[p_{power}, p_{RBG}]$ requires a 2D search space (MILP reformulation or 2D-grid heuristic).
+2. **Context-conditioned ANN** — the paper's ANN predicts KPIs from candidate parameter settings only; adding $(d, v)$ as features is an extension.
+3. **Scalarized RBG allocation** — the A2C paper's RBG allocation is combinatorial (which RBGs, which UEs); QACM bargains over a scalar "number of RBGs", simplifying the control space.
+4. **QoS thresholds must be defined** — QACM's objective is QoS-threshold satisfaction ($s_i$); the A2C scenario has no QoS thresholds (it optimizes $\tau_e$). Target rate / leftover-bits thresholds must be defined to make QACM's objective and the comparison meaningful.
+
+**Tradeoffs:**
+
+| Pro | Con |
+| :--- | :--- |
+| A2C runs exactly as published (native reward, Method 1/2, activation masks) | QACM is extended: joint-parameter bargaining, context-conditioned ANN, scalarized RBG |
+| No reward redesign → Q3 becomes moot | QACM's published algorithm is single-parameter; 2D search adds complexity and latency |
+| Both paradigms context-aware via $c^\dagger = [d, v]$ | RBG scalarization loses the combinatorial structure of the A2C scenario |
+| Macro-vs-micro asymmetry is the intended finding | QoS thresholds must be invented for the A2C scenario |
+| A2C paper's $\tau_e$ / leftover-bits metrics directly reproducible | Testbed adaptation (2 gNBs/10 UEs vs. 4 O-RUs/16 UEs) needed regardless |
+
+### Tradeoff comparison
+
+| Dimension | Proposal A (QACM scenario) | Proposal B (A2C scenario) |
+| :--- | :--- | :--- |
+| A2C fidelity | Modified (reward, conflict type, Method 1/2) | **As published** |
+| QACM fidelity | **As published** | Extended (joint-vector, context ANN, scalarized RBG) |
+| Scenario | ES vs. CCO direct conflict over TXP | Power + RBG indirect conflict |
+| Context | Re-derived for the QACM scenario | Native $(d, v)$ for both |
+| Q3 (A2C reward) | Required | Moot |
+| Paper reference case | QACM 15/16 dBm reproducible | A2C $\tau_e$ / leftover-bits reproducible |
+| Main risk | A2C distortion | QACM extension complexity |
 
 ### Decision point
 
 - **Where:** Phase 2 (xApp training) / Phase 3 (A2C scheduler) — `implementation-plan.md` tasks 3.x.
 - **Risk register entry:** "Scenario mapping between the two papers" (add if not present).
-- **Comparison note:** the A2C scheduler's inability to express a continuous compromise (problem 4) is itself a finding — macro-level activation scheduling vs. micro-level parameter bargaining — and should be discussed in the thesis.
+- **Current direction (iter-3):** **Proposal B** — the A2C scenario is the common scenario; QACM is extended to joint-parameter bargaining. The QACM-side extensions are accepted and reported as such in the thesis.
 
 ---
 
 ## Q3. What reward should the A2C scheduler use in the QACM scenario?
 
-**Status:** Open — decision required before Phase 3 (A2C scheduler).
+**Status:** **Moot under Proposal B (iter-3)** — the A2C scenario keeps the native reward (normalized rate $\tau_e$); no redesign needed. Only relevant if Proposal A (QACM scenario) is chosen.
 
 ### Context
 

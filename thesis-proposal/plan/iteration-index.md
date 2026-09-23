@@ -58,3 +58,37 @@ iter-2 implements the pivot: the **QACM scenario** (ES vs. CCO direct conflict o
 - Scenario extended with context variables ($d \in \{5,10,15\}$ Gbps, $v \in \{1,3,5\}$ m/s) so the A2C scheduler is context-aware.
 
 **Current files:** `iteration-2/spec.md`, `iteration-2/implementation-plan.md`
+
+---
+
+## Iteration 3 (iter-3)
+
+**Archived files:**
+- `iteration-3/spec.md`
+- `iteration-3/implementation-plan.md`
+
+**Date:** 2026-09-23
+
+### Problem
+
+iter-2 (Proposal A) adapted the A2C scheduler to the QACM scenario (ES vs. CCO direct conflict over TXP). Analysis of the proposal (see `open-questions.md`, Q2) showed this distorts the A2C side: reward redesign (Q3), conflict-type extension, destroyed Method 1/2 semantics, and an artificial discretization problem. The comparison was structurally asymmetric in the wrong direction.
+
+### Why we pivoted
+
+A new proposal (Proposal B, `open-questions.md` Q2) keeps the **A2C scenario** (Power xApp + RBG xApp indirect conflict) as the common scenario and extends **QACM** to bargain over the joint control vector $\mathbf{p} = [p_{power}, p_{RBG}]$:
+
+1. **A2C runs exactly as published** — native reward (normalized rate $\tau_e$), Method 1/2 semantics, activation masks, pre-trained immutable xApps. No reward redesign → Q3 becomes moot.
+2. **QACM's design intent covers the scenario** — the paper explicitly handles direct/indirect/implicit conflicts (2405.07324v2:103, 204, 242) and its §VII-C case study evaluates indirect conflicts (2405.07324v2:356). The two-NCP indirect conflict is within its framework.
+3. **Context is native** — $c^\dagger = [d, v]$ is passed into QACM's ANN as features alongside candidate parameter settings, so both paradigms are context-aware.
+4. **The macro-vs-micro asymmetry becomes the intended finding** — activation scheduling vs. parameter bargaining — instead of a distortion.
+
+**Accepted QACM-side extensions (reported in the thesis):** joint-parameter bargaining (paper's solver is single-parameter), context-conditioned ANN, scalarized RBG allocation, and QoS thresholds defined for the A2C scenario ($q_1$: $\tau_e \geq 0.9$; $q_2$: leftover ratio $\leq 0.05$).
+
+### New direction (iter-3)
+
+- Common scenario: **Power + RBG indirect conflict** (A2C scenario), adapted to the testbed (2 gNBs / 10 UEs / 12 RBGs per gNB / 20 MHz).
+- A2C scheduler implemented **as published** (native $\tau_e$ reward, Method 1/2, confidence-gated fallback).
+- QACM **extended** to joint-parameter bargaining over $\mathbf{p} = [p_{power}, p_{RBG}]$ with context-conditioned ANN KPI prediction.
+- Both paradigms evaluated on the same metrics: $\tau_e$, leftover bits, QoS satisfaction, control volatility, mitigation latency.
+
+**Current files:** `iteration-3/spec.md`, `iteration-3/implementation-plan.md`
