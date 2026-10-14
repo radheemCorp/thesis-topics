@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# uv / virtualenv
+.venv/
+
+# Generated artifacts
+out/
+
+# Datasets (large; some are nested git repos)
+data/

@@ -1,0 +1,17 @@
+{
+  "track_id": "surrogate-xapps_20261014",
+  "type": "feature",
+  "status": "completed",
+  "created_at": "2026-10-14T18:05:21Z",
+  "updated_at": "2026-10-14T21:05:00Z",
+  "description": "Surrogate CCO (throughput-maximizing) and ES (power-minimizing) xApps over QACM/cmsORAN CSV datasets, emitting QACM CMC control-request JSON with full [p1,p2] tuples",
+  "model_selection": {
+    "cco": "ann",
+    "es": "ann",
+    "note": "ANN R2 ~0.995 on data1 vs 0.53 for poly-3; poly remains available via --model poly"
+  },
+  "verification": {
+    "tests_passed": 41,
+    "coverage_percent": 95
+  }
+}
