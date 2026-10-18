@@ -34,9 +34,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 3 — Runner Integration & Before/After Demo
 
-- [ ] Task: Integrate CMC into the runner
-  - [ ] Write failing tests: demo entrypoint trains CCO+ES, detects conflict, runs `CMC.mitigate`, returns a result object with before/after satisfaction.
-  - [ ] Implement CMC runner path (extend `runner.py` or add `run_cmc_demo`).
+- [x] Task: Integrate CMC into the runner — f977181
+  - [x] Write failing tests: demo entrypoint trains CCO+ES, detects conflict, runs `CMC.mitigate`, returns a result object with before/after satisfaction.
+  - [x] Implement CMC runner path (extend `runner.py` or add `run_cmc_demo`).
 - [ ] Task: Before/after comparison report
   - [ ] Write failing tests: report prints each xApp's requested vs. compromised KPI, QoS met?, and total #satisfied before vs. after.
   - [ ] Implement the comparison report (CLI output).
