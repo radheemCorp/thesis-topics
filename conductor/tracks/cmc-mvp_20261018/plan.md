@@ -11,9 +11,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 1 — `IQueryableXApp` Protocol & Adapter
 
-- [ ] Task: Define `IQueryableXApp` protocol
-  - [ ] Write failing tests: mock xApp satisfying the protocol exposes `predict_at(p1) -> float`; structural check that CCO/ES instances satisfy it (via `typing.runtime_checkable` or duck-typing assertion).
-  - [ ] Implement `IQueryableXApp` protocol in `surrogate_xapps/cmc.py` (or a new `protocols.py`).
+- [x] Task: Define `IQueryableXApp` protocol — e80ef06
+  - [x] Write failing tests: mock xApp satisfying the protocol exposes `predict_at(p1) -> float`; structural check that CCO/ES instances satisfy it (via `typing.runtime_checkable` or duck-typing assertion).
+  - [x] Implement `IQueryableXApp` protocol in `surrogate_xapps/cmc.py` (or a new `protocols.py`).
 - [ ] Task: Add `predict_at` adapter on `BaseXApp`
   - [ ] Write failing tests: `predict_at(p1)` on a trained CCO/ES returns the surrogate-predicted KPI with `p2` held at the xApp's observed constant; matches `predict_kpi` on the equivalent feature row.
   - [ ] Implement `predict_at` on `BaseXApp` (builds the `[p1, p2_const]` row and calls `predict_kpi`).
