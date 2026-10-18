@@ -1,0 +1,6 @@
+Phase 2 Verification Report
+Automated: CI=true uv run pytest -> 57 passed.
+Scope: 27f0b4a..HEAD code files: cmc.py, xapps.py, tests/test_cmc.py (all covered).
+Added: MitigationResult dataclass, CMC discrete heuristic (Algorithm 1), modularity (Sequence[IQueryableXApp], 3-xApp + no-concrete-import verified).
+Manual verification (user confirmed): CMC returns optimal p1* with before/after satisfaction counts on CCO+ES.
+User confirmation: Yes, confirmed.
