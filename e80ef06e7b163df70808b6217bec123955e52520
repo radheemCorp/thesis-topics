@@ -1,0 +1,4 @@
+Task: Define IQueryableXApp protocol
+Summary: Added runtime-checkable Protocol in surrogate_xapps/cmc.py requiring predict_at(p1) -> float. This is the only capability the CMC needs from xApps (QACM no-data-sharing).
+Files: surrogate_xapps/cmc.py (new), tests/test_cmc.py (new, 3 tests).
+Why: Establishes the modular contract so CMC depends only on the protocol, never concrete xApp classes.
