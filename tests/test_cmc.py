@@ -100,3 +100,56 @@ def test_predict_at_holds_p2_constant(trained_es: ESxApp):
     k2 = float(trained_es.predict_kpi(row2)[0])
     assert trained_es.predict_at(-100.0) == pytest.approx(k1)
     assert trained_es.predict_at(-50.0) == pytest.approx(k2)
+
+
+# --- MitigationResult dataclass -------------------------------------------
+
+from surrogate_xapps.cmc import MitigationResult  # noqa: E402
+
+
+def test_mitigation_result_fields():
+    per_xapp = [
+        {"xapp_id": "a", "satisfied_at_optimum": True, "satisfied_before": False},
+        {"xapp_id": "b", "satisfied_at_optimum": False, "satisfied_before": False},
+    ]
+    res = MitigationResult(
+        optimal_value=1.0,
+        per_xapp=per_xapp,
+        n_satisfied_before=0,
+        n_satisfied_after=1,
+    )
+    assert res.optimal_value == 1.0
+    assert res.per_xapp == per_xapp
+    assert res.n_satisfied_before == 0
+    assert res.n_satisfied_after == 1
+
+
+def test_mitigation_result_improved():
+    res = MitigationResult(
+        optimal_value=0.0,
+        per_xapp=[],
+        n_satisfied_before=1,
+        n_satisfied_after=2,
+    )
+    assert res.improved() is True
+
+
+def test_mitigation_result_improved_when_equal():
+    # Per spec FR-3: improved() reflects after >= before (did not worsen).
+    res = MitigationResult(
+        optimal_value=0.0,
+        per_xapp=[],
+        n_satisfied_before=1,
+        n_satisfied_after=1,
+    )
+    assert res.improved() is True
+
+
+def test_mitigation_result_not_improved_when_worse():
+    res = MitigationResult(
+        optimal_value=0.0,
+        per_xapp=[],
+        n_satisfied_before=2,
+        n_satisfied_after=1,
+    )
+    assert res.improved() is False
