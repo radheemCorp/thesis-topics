@@ -1,0 +1,6 @@
+Phase 1 Verification Report
+Automated: CI=true uv run pytest -> 47 passed.
+Scope: d04550a..HEAD code files: cmc.py, xapps.py, test_cmc.py (all covered by tests/test_cmc.py).
+Manual verification (user confirmed): Both CCO/ES satisfy IQueryableXApp; predict_at returns numeric KPI near infer_action values (CCO ~1.00, ES ~-0.01).
+Files: surrogate_xapps/cmc.py, surrogate_xapps/xapps.py, tests/test_cmc.py.
+User confirmation: Yes, confirmed.
