@@ -32,7 +32,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Verify/refactor so CMC depends only on `IQueryableXApp`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
-## Phase 3 — Runner Integration & Before/After Demo
+## Phase 3 — Runner Integration & Before/After Demo [checkpoint: 8d0b6cb]
 
 - [x] Task: Integrate CMC into the runner — f977181
   - [x] Write failing tests: demo entrypoint trains CCO+ES, detects conflict, runs `CMC.mitigate`, returns a result object with before/after satisfaction.
