@@ -44,7 +44,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Run demo on `data/cmsORAN/data1.csv` & `data2.csv`; confirm `p*` lies between conflicting requests and `n_satisfied_after ≥ n_satisfied_before`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
-## Phase 4 — Documentation & Finalization
+## Phase 4 — Documentation & Finalization [checkpoint: e96bb25]
 
 - [x] Task: Document CMC public API — a2a4836
   - [x] Add numpydoc docstrings to all new public classes/methods per `product-guidelines.md`.
