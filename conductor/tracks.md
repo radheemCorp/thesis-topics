@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: QACM Conflict Mitigation Controller (CMC) MVP**
+- [x] **Track: QACM Conflict Mitigation Controller (CMC) MVP**
 *Link: [./cmc-mvp_20261018/](./cmc-mvp_20261018/)*
