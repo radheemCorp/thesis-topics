@@ -27,9 +27,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Implement `CMC.mitigate` discrete heuristic — d8a0948
   - [x] Write failing tests with **mock** xApps (analytic linear KPIs, known thresholds → hand-computed optimal `p*`); weight normalization to sum 1; deviation `d_i` and satisfaction `s_i` directions for both `max` and `min` objectives; cost `Σ w_i·d_i·ζ − (Σ s_i)²`; returns minimizing `p1`.
   - [x] Implement `CMC` class with `__init__(range, resolution, zeta=1e3)` and `mitigate(xapps)` in pure numpy.
-- [ ] Task: Modularly accept arbitrary xApp count
-  - [ ] Write failing test: adding a 3rd mock xApp changes no CMC code (only the input list); CMC never imports CCO/ES concretely.
-  - [ ] Verify/refactor so CMC depends only on `IQueryableXApp`.
+- [x] Task: Modularly accept arbitrary xApp count — 1dd1cb4
+  - [x] Write failing test: adding a 3rd mock xApp changes no CMC code (only the input list); CMC never imports CCO/ES concretely.
+  - [x] Verify/refactor so CMC depends only on `IQueryableXApp`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3 — Runner Integration & Before/After Demo
