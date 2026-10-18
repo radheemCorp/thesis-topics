@@ -7,8 +7,10 @@ Controller MVP before it is implemented (TDD Red phase).
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Protocol, runtime_checkable
 
+import numpy as np
 import pytest
 
 from surrogate_xapps.cmc import IQueryableXApp
@@ -53,3 +55,48 @@ def test_protocol_predict_at_returns_float():
     xapp = _MockXApp("x", 1.0, 0.0, "max", 0.5, 0.5)
     result = xapp.predict_at(1.0)
     assert isinstance(result, float)
+
+
+# --- BaseXApp.predict_at adapter -------------------------------------------
+
+from surrogate_xapps.config import CCO_CONFIG, ES_CONFIG  # noqa: E402
+from surrogate_xapps.data_loader import load_dataset  # noqa: E402
+from surrogate_xapps.xapps import CCOxApp, ESxApp  # noqa: E402
+
+
+@pytest.fixture
+def trained_cco(cco_file: Path) -> CCOxApp:
+    X, y, _ = load_dataset(cco_file, CCO_CONFIG.spec)
+    return CCOxApp(CCO_CONFIG).train(X, y)
+
+
+@pytest.fixture
+def trained_es(es_file: Path) -> ESxApp:
+    X, y, _ = load_dataset(es_file, ES_CONFIG.spec)
+    return ESxApp(ES_CONFIG).train(X, y)
+
+
+def test_base_xapp_satisfies_protocol(trained_cco: CCOxApp, trained_es: ESxApp):
+    assert isinstance(trained_cco, IQueryableXApp)
+    assert isinstance(trained_es, IQueryableXApp)
+
+
+def test_predict_at_matches_predict_kpi(trained_cco: CCOxApp):
+    p1 = -47.49
+    p2_const = trained_cco.ranges_["p2"][0]
+    row = np.array([[p1, p2_const]])
+    expected = float(trained_cco.predict_kpi(row)[0])
+    got = trained_cco.predict_at(p1)
+    assert got == pytest.approx(expected)
+
+
+def test_predict_at_holds_p2_constant(trained_es: ESxApp):
+    # predict_at must hold p2 at the observed constant (min of range for ES=60).
+    p2_const = trained_es.ranges_["p2"][0]
+    assert p2_const == 60.0
+    row1 = np.array([[-100.0, p2_const]])
+    row2 = np.array([[-50.0, p2_const]])
+    k1 = float(trained_es.predict_kpi(row1)[0])
+    k2 = float(trained_es.predict_kpi(row2)[0])
+    assert trained_es.predict_at(-100.0) == pytest.approx(k1)
+    assert trained_es.predict_at(-50.0) == pytest.approx(k2)

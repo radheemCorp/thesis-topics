@@ -163,6 +163,29 @@ class BaseXApp:
             return predicted_kpi >= self.config.qos_threshold
         return predicted_kpi <= self.config.qos_threshold
 
+    def predict_at(self, p1: float) -> float:
+        """Predicted KPI if forced to use ``p1`` (p2 held at observed constant).
+
+        Satisfies :class:`~surrogate_xapps.cmc.IQueryableXApp` so the CMC can
+        query this xApp without touching its internals.
+
+        Parameters
+        ----------
+        p1:
+            The value of the shared Input Control Parameter.
+
+        Returns
+        -------
+        float
+            The surrogate-predicted KPI at ``p1`` with ``p2`` fixed.
+        """
+        if self.ranges_ is None:
+            raise RuntimeError("xApp must be trained before predict_at()")
+        names = list(self.config.spec.feature_names)
+        p2_const = self.ranges_[names[1]][0]
+        row = np.array([[float(p1), float(p2_const)]])
+        return float(self.predict_kpi(row)[0])
+
 
 class CCOxApp(BaseXApp):
     """Coverage & Capacity Optimization xApp: maximizes the throughput KPI."""
