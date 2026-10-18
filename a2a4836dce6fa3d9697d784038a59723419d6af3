@@ -1,0 +1,4 @@
+Task: Document CMC public API
+Summary: Verified all public classes/methods have numpydoc docstrings; wrote docs/RUNNING_CMC.md covering the demo, options, and programmatic use with new xApps.
+Files: surrogate_xapps/docs/RUNNING_CMC.md (new).
+Why: NFR/documentation requirement per product-guidelines.md.
