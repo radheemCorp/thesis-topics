@@ -9,7 +9,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ---
 
-## Phase 1 — `IQueryableXApp` Protocol & Adapter
+## Phase 1 — `IQueryableXApp` Protocol & Adapter [checkpoint: 27f0b4a]
 
 - [x] Task: Define `IQueryableXApp` protocol — e80ef06
   - [x] Write failing tests: mock xApp satisfying the protocol exposes `predict_at(p1) -> float`; structural check that CCO/ES instances satisfy it (via `typing.runtime_checkable` or duck-typing assertion).
