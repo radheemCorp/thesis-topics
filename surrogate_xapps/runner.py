@@ -114,6 +114,51 @@ def run_cmc_demo(
     }
 
 
+def print_cmc_report(result: dict[str, Any]) -> None:
+    """Print a before/after QoS comparison table for a CMC demo run.
+
+    Parameters
+    ----------
+    result:
+        The dict returned by :func:`run_cmc_demo`.
+    """
+    mit: MitigationResult = result["mitigation"]
+    action_cco = result["action_cco"]
+    action_es = result["action_es"]
+
+    print("QACM Conflict Mitigation — before/after QoS")
+    print("=" * 60)
+    print(f"Optimal compromise p* (p1) = {mit.optimal_value:.2f}")
+    print()
+    header = (
+        f"{'xApp':<10} {'req_p1':>9} {'kpi@req':>9} {'kpi@p*':>9} "
+        f"{'thr':>7} {'sat_before':>11} {'sat_after':>10}"
+    )
+    print(header)
+    print("-" * len(header))
+    req_by_id = {
+        action_cco["xapp_id"]: action_cco["requested_value"][0],
+        action_es["xapp_id"]: action_es["requested_value"][0],
+    }
+    kpi_req_by_id = {
+        action_cco["xapp_id"]: action_cco["predicted_kpi"],
+        action_es["xapp_id"]: action_es["predicted_kpi"],
+    }
+    for rec in mit.per_xapp:
+        xid = rec["xapp_id"]
+        print(
+            f"{xid:<10} {req_by_id[xid]:>9.2f} {kpi_req_by_id[xid]:>9.3f} "
+            f"{rec['predicted_at_optimum']:>9.3f} {rec['qos_threshold']:>7.2f} "
+            f"{str(rec['satisfied_before']):>11} {str(rec['satisfied_at_optimum']):>10}"
+        )
+    print()
+    print(
+        f"Satisfied before: {mit.n_satisfied_before}/{len(mit.per_xapp)}  ->  "
+        f"Satisfied after: {mit.n_satisfied_after}/{len(mit.per_xapp)}"
+    )
+    print("IMPROVED" if mit.improved() else "NOT IMPROVED")
+
+
 def _print_report(
     action_cco: dict[str, Any],
     action_es: dict[str, Any],

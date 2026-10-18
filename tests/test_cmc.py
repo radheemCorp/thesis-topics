@@ -258,3 +258,25 @@ def test_run_cmc_demo_optimum_between_requests(cco_file: Path, es_file: Path):
     p_star = result["mitigation"].optimal_value
     # Optimum must lie within the conflict interval [min, max] of the requests.
     assert lo - 1.0 <= p_star <= hi + 1.0
+
+
+# --- Before/after comparison report ---------------------------------------
+
+from surrogate_xapps.runner import print_cmc_report  # noqa: E402
+
+
+def test_print_cmc_report_output(cco_file: Path, es_file: Path, capsys):
+    result = run_cmc_demo(cco_file=cco_file, es_file=es_file, resolution=100)
+    print_cmc_report(result)
+    out = capsys.readouterr().out
+    assert "Satisfied before" in out
+    assert "Satisfied after" in out
+    assert "xApp_CCO" in out
+    assert "xApp_ES" in out
+
+
+def test_print_cmc_report_shows_optimum(cco_file: Path, es_file: Path, capsys):
+    result = run_cmc_demo(cco_file=cco_file, es_file=es_file, resolution=100)
+    print_cmc_report(result)
+    out = capsys.readouterr().out
+    assert "optimal" in out.lower() or "p*" in out
