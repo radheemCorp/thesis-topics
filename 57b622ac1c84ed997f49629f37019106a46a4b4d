@@ -1,0 +1,4 @@
+Task: Before/after comparison report
+Summary: Added print_cmc_report() printing optimal p*, per-xApp requested vs compromised KPI, QoS flags, and total satisfied before/after with IMPROVED marker.
+Files: surrogate_xapps/runner.py, tests/test_cmc.py (2 report tests).
+Why: User-facing before/after comparison that illustrates QACM mitigation (goal of the MVP).
