@@ -1,0 +1,8 @@
+{
+  "track_id": "cmc-mvp_20261018",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-10-18T00:00:00Z",
+  "updated_at": "2026-10-18T00:00:00Z",
+  "description": "QACM Conflict Mitigation Controller (CMC) MVP — resolve direct conflicts between CCO & ES xApps via the QoS-aware discrete heuristic, with a modular IQueryableXApp interface so future xApps plug in without touching CMC logic"
+}
