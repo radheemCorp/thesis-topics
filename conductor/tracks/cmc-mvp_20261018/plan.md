@@ -21,9 +21,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 2 — `CMC` Heuristic & `MitigationResult`
 
-- [ ] Task: Define `MitigationResult` dataclass
-  - [ ] Write failing tests: fields populated correctly; `improved()` reflects satisfaction counts.
-  - [ ] Implement `MitigationResult` dataclass.
+- [x] Task: Define `MitigationResult` dataclass — 0ea2cc5
+  - [x] Write failing tests: fields populated correctly; `improved()` reflects satisfaction counts.
+  - [x] Implement `MitigationResult` dataclass.
 - [ ] Task: Implement `CMC.mitigate` discrete heuristic
   - [ ] Write failing tests with **mock** xApps (analytic linear KPIs, known thresholds → hand-computed optimal `p*`); weight normalization to sum 1; deviation `d_i` and satisfaction `s_i` directions for both `max` and `min` objectives; cost `Σ w_i·d_i·ζ − (Σ s_i)²`; returns minimizing `p1`.
   - [ ] Implement `CMC` class with `__init__(range, resolution, zeta=1e3)` and `mitigate(xapps)` in pure numpy.
