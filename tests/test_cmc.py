@@ -24,16 +24,22 @@ class _HasPredictAt(Protocol):
 
 
 class _MockXApp:
-    """Analytic mock xApp whose KPI is a simple function of p1."""
+    """Analytic mock xApp whose KPI is a simple linear function of p1.
+
+    Exposes the flat metadata contract the CMC reads (xapp_id, objective,
+    qos_threshold, priority_weight, preferred_value) plus ``predict_at``.
+    """
 
     def __init__(self, xapp_id: str, slope: float, intercept: float, objective: str,
-                 qos_threshold: float, priority_weight: float, p2_const: float = 0.0):
+                 qos_threshold: float, priority_weight: float,
+                 preferred_value: float = 0.0, p2_const: float = 0.0):
         self.xapp_id = xapp_id
         self.slope = slope
         self.intercept = intercept
         self.objective = objective
         self.qos_threshold = qos_threshold
         self.priority_weight = priority_weight
+        self.preferred_value = preferred_value
         self.p2_const = p2_const
 
     def predict_at(self, p1: float) -> float:
@@ -153,3 +159,56 @@ def test_mitigation_result_not_improved_when_worse():
         n_satisfied_after=1,
     )
     assert res.improved() is False
+
+
+# --- CMC discrete heuristic -------------------------------------------
+
+from surrogate_xapps.cmc import CMC  # noqa: E402
+
+
+def _two_conflicting():
+    # A wants high p1 (max), B wants low p1 (min) over the SAME KPI f(p1)=p1.
+    # Hand-computed optimum on grid [0..5] with zeta=1e3, w=(0.6,0.4):
+    # cost(p1=3) = 399, unique min. See spec FR-2.
+    a = _MockXApp("A", slope=1.0, intercept=0.0, objective="max",
+                  qos_threshold=3.0, priority_weight=0.6, preferred_value=5.0)
+    b = _MockXApp("B", slope=1.0, intercept=0.0, objective="min",
+                  qos_threshold=2.0, priority_weight=0.4, preferred_value=0.0)
+    return [a, b]
+
+
+def test_cmc_returns_hand_computed_optimum():
+    cmc = CMC(range=(0.0, 5.0), resolution=6, zeta=1e3)
+    res = cmc.mitigate(_two_conflicting())
+    assert res.optimal_value == pytest.approx(3.0)
+
+
+def test_cmc_satisfaction_counts():
+    cmc = CMC(range=(0.0, 5.0), resolution=6, zeta=1e3)
+    res = cmc.mitigate(_two_conflicting())
+    # At p1=3: A (max, q=3) satisfied; B (min, q=2) not -> 1 after.
+    # Before: A at preferred 5 (5>=3 satisfied), B at preferred 0 (0<=2 satisfied) -> 2.
+    assert res.n_satisfied_after == 1
+    assert res.n_satisfied_before == 2
+
+
+def test_cmc_per_xapp_records():
+    cmc = CMC(range=(0.0, 5.0), resolution=6, zeta=1e3)
+    res = cmc.mitigate(_two_conflicting())
+    by_id = {r["xapp_id"]: r for r in res.per_xapp}
+    assert by_id["A"]["satisfied_at_optimum"] is True
+    assert by_id["B"]["satisfied_at_optimum"] is False
+    assert by_id["A"]["satisfied_before"] is True
+    assert by_id["B"]["satisfied_before"] is True
+    assert by_id["A"]["predicted_at_optimum"] == pytest.approx(3.0)
+
+
+def test_cmc_normalizes_weights():
+    # Scaling all weights by a constant must not change the optimum.
+    a1 = _MockXApp("A", 1.0, 0.0, "max", 3.0, 0.6, 5.0)
+    b1 = _MockXApp("B", 1.0, 0.0, "min", 2.0, 0.4, 0.0)
+    a2 = _MockXApp("A", 1.0, 0.0, "max", 3.0, 6.0, 5.0)
+    b2 = _MockXApp("B", 1.0, 0.0, "min", 2.0, 4.0, 0.0)
+    r1 = CMC(range=(0.0, 5.0), resolution=6).mitigate([a1, b1])
+    r2 = CMC(range=(0.0, 5.0), resolution=6).mitigate([a2, b2])
+    assert r1.optimal_value == pytest.approx(r2.optimal_value)

@@ -97,6 +97,32 @@ class BaseXApp:
         self.model: SurrogateModel = model if model is not None else build_model(config)
         self.ranges_: dict[str, tuple[float, float]] | None = None
 
+    # -- IQueryableXApp metadata (flat accessors over config) --------------
+    @property
+    def xapp_id(self) -> str:
+        """Identifier of this xApp (from config)."""
+        return self.config.xapp_id
+
+    @property
+    def objective(self) -> str:
+        """``"max"`` or ``"min"`` (from config)."""
+        return self.config.objective
+
+    @property
+    def qos_threshold(self) -> float:
+        """QoS threshold for the predicted KPI (from config)."""
+        return float(self.config.qos_threshold)
+
+    @property
+    def priority_weight(self) -> float:
+        """Relative priority weight (from config)."""
+        return float(self.config.priority_weight)
+
+    @property
+    def preferred_value(self) -> float:
+        """This xApp's own optimal ``p1`` (its uncoordinated request)."""
+        return float(self.infer_action()["requested_value"][0])
+
     # -- training ---------------------------------------------------------
     def train(self: XAppT, X: np.ndarray, y: np.ndarray) -> XAppT:
         """Fit the surrogate and record the observed parameter ranges."""
