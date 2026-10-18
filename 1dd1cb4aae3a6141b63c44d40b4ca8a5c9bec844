@@ -1,0 +1,4 @@
+Task: Modularly accept arbitrary xApp count
+Summary: Widened mitigate() to Sequence[IQueryableXApp] (covariant) so 3+ xApps plug in with only an input-list change. Verified CMC source imports no concrete CCOxApp/ESxApp.
+Files: surrogate_xapps/cmc.py, tests/test_cmc.py (3-xApp + no-concrete-import tests).
+Why: NFR-1 modularity — CMC depends only on the protocol, future xApps need no CMC edits.
