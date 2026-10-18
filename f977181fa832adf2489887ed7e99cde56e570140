@@ -1,0 +1,4 @@
+Task: Integrate CMC into the runner
+Summary: Added run_cmc_demo() that trains CCO+ES, detects conflict, runs CMC over the shared p1 range (intersection of both observed ranges), returns dict with actions + MitigationResult.
+Files: surrogate_xapps/runner.py, tests/test_cmc.py (2 demo tests).
+Why: Phase 3 demo entrypoint wiring the pre-built CMC to real xApps.
