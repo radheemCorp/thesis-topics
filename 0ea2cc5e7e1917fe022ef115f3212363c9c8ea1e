@@ -1,0 +1,4 @@
+Task: Define MitigationResult dataclass
+Summary: Added dataclass with optimal_value, per_xapp records, before/after satisfaction counts, and improved() (after >= before per FR-3).
+Files: surrogate_xapps/cmc.py, tests/test_cmc.py (4 new tests).
+Why: Structured result type the CMC returns and the runner reports from.
