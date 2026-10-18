@@ -1,0 +1,6 @@
+Phase 4 Verification Report
+Automated: CI=true uv run pytest -> 61 passed; coverage 95% overall (cmc.py 97%).
+Scope: 8d0b6cb..HEAD code files: surrogate_xapps/docs/RUNNING_CMC.md (new).
+Added: CMC run guide with demo, options, and programmatic usage. All public API has numpydoc docstrings.
+Manual verification (user confirmed): docstrings present; guide covers before/after table and modularity.
+User confirmation: Yes, confirmed.
