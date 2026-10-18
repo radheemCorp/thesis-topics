@@ -1,0 +1,4 @@
+Task: Add predict_at adapter on BaseXApp
+Summary: Added BaseXApp.predict_at(p1) that holds p2 at the observed constant (from ranges_) and returns the surrogate-predicted KPI. Satisfies IQueryableXApp so CCO/ES can be queried by the CMC.
+Files: surrogate_xapps/xapps.py (modified), tests/test_cmc.py (3 new adapter tests).
+Why: Bridges existing trained xApps to the CMC query contract without duplicating prediction logic.
