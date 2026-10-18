@@ -46,9 +46,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 4 — Documentation & Finalization
 
-- [ ] Task: Document CMC public API
-  - [ ] Add numpydoc docstrings to all new public classes/methods per `product-guidelines.md`.
-  - [ ] Write a run guide (like `docs/RUNNING_XAPPS.md`) for the CMC demo (`docs/RUNNING_CMC.md`).
+- [x] Task: Document CMC public API — a2a4836
+  - [x] Add numpydoc docstrings to all new public classes/methods per `product-guidelines.md`.
+  - [x] Write a run guide (like `docs/RUNNING_XAPPS.md`) for the CMC demo (`docs/RUNNING_CMC.md`).
 - [ ] Task: Final coverage & regression check
   - [ ] `uv run pytest` green; coverage >80% across new CMC modules.
   - [ ] Confirm existing surrogate-xapps tests still pass (no regression).
