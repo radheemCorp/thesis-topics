@@ -1,0 +1,4 @@
+Task: Implement CMC discrete heuristic
+Summary: Added CMC class (range, resolution, zeta) with mitigate() sweeping the candidate grid, querying predict_at, computing weighted deviation - satisfied^2 cost, returning MitigationResult. Extended IQueryableXApp to declare flat metadata; exposed xapp_id/objective/qos_threshold/priority_weight/preferred_value on BaseXApp.
+Files: surrogate_xapps/cmc.py, surrogate_xapps/xapps.py, tests/test_cmc.py (4 heuristic tests + protocol fix).
+Why: Core QACM mitigation logic (Algorithm 1) with hand-computed optimum verified.
