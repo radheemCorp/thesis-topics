@@ -19,7 +19,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Implement `predict_at` on `BaseXApp` (builds the `[p1, p2_const]` row and calls `predict_kpi`).
 - [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
-## Phase 2 — `CMC` Heuristic & `MitigationResult`
+## Phase 2 — `CMC` Heuristic & `MitigationResult` [checkpoint: 22b23c4]
 
 - [x] Task: Define `MitigationResult` dataclass — 0ea2cc5
   - [x] Write failing tests: fields populated correctly; `improved()` reflects satisfaction counts.
