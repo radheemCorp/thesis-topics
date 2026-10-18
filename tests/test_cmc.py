@@ -235,3 +235,26 @@ def test_cmc_does_not_import_concrete_xapps():
     src = inspect.getsource(cmc_mod)
     assert "CCOxApp" not in src
     assert "ESxApp" not in src
+
+
+# --- Runner integration (run_cmc_demo) ------------------------------------
+
+from surrogate_xapps.runner import run_cmc_demo  # noqa: E402
+
+
+def test_run_cmc_demo_returns_result(cco_file: Path, es_file: Path):
+    result = run_cmc_demo(cco_file=cco_file, es_file=es_file, resolution=100)
+    assert result["conflict"] is True
+    assert result["mitigation"].optimal_value is not None
+    assert len(result["mitigation"].per_xapp) == 2
+    assert result["mitigation"].n_satisfied_after >= 0
+
+
+def test_run_cmc_demo_optimum_between_requests(cco_file: Path, es_file: Path):
+    result = run_cmc_demo(cco_file=cco_file, es_file=es_file, resolution=100)
+    cco_req = result["action_cco"]["requested_value"][0]
+    es_req = result["action_es"]["requested_value"][0]
+    lo, hi = min(cco_req, es_req), max(cco_req, es_req)
+    p_star = result["mitigation"].optimal_value
+    # Optimum must lie within the conflict interval [min, max] of the requests.
+    assert lo - 1.0 <= p_star <= hi + 1.0

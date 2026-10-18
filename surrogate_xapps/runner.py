@@ -12,6 +12,7 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any, Sequence
 
+from .cmc import CMC, MitigationResult
 from .config import CCO_CONFIG, ES_CONFIG
 from .data_loader import load_dataset
 from .xapps import CCOxApp, ESxApp
@@ -63,6 +64,54 @@ def run(
     action_cco = cco.infer_action()
     action_es = es.infer_action()
     return action_cco, action_es, cco, es
+
+
+def run_cmc_demo(
+    cco_file: str | Path = DEFAULT_CCO_FILE,
+    es_file: str | Path = DEFAULT_ES_FILE,
+    model_kind: str = "ann",
+    resolution: int = 200,
+    cmc_resolution: int = 300,
+) -> dict[str, Any]:
+    """Train CCO+ES, detect their conflict, and run the CMC mitigation.
+
+    Parameters
+    ----------
+    cco_file, es_file:
+        Paths to the CCO and ES datasets.
+    model_kind:
+        Surrogate backend (``"ann"`` or ``"poly"``).
+    resolution:
+        Grid resolution for each xApp's decision search.
+    cmc_resolution:
+        Number of discrete candidates the CMC sweeps over the shared ICP.
+
+    Returns
+    -------
+    dict
+        ``{"action_cco", "action_es", "conflict", "mitigation", "cco", "es"}``
+        where ``mitigation`` is a :class:`~surrogate_xapps.cmc.MitigationResult`.
+    """
+    action_cco, action_es, cco, es = run(
+        cco_file=cco_file, es_file=es_file, model_kind=model_kind,
+        resolution=resolution,
+    )
+    conflict = detect_conflict(action_cco, action_es)
+
+    # Shared ICP p1 range = intersection of both xApps' observed p1 ranges.
+    lo = max(cco.ranges_["p1"][0], es.ranges_["p1"][0])
+    hi = min(cco.ranges_["p1"][1], es.ranges_["p1"][1])
+    cmc = CMC(range=(lo, hi), resolution=cmc_resolution)
+    mitigation: MitigationResult = cmc.mitigate([cco, es])
+
+    return {
+        "action_cco": action_cco,
+        "action_es": action_es,
+        "conflict": conflict,
+        "mitigation": mitigation,
+        "cco": cco,
+        "es": es,
+    }
 
 
 def _print_report(
