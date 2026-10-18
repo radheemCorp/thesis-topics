@@ -212,3 +212,26 @@ def test_cmc_normalizes_weights():
     r1 = CMC(range=(0.0, 5.0), resolution=6).mitigate([a1, b1])
     r2 = CMC(range=(0.0, 5.0), resolution=6).mitigate([a2, b2])
     assert r1.optimal_value == pytest.approx(r2.optimal_value)
+
+
+# --- Modularity (arbitrary xApp count, no concrete imports) --------------
+
+def test_cmc_accepts_three_xapps():
+    # Adding a 3rd xApp only changes the input list — no CMC code change.
+    a = _MockXApp("A", 1.0, 0.0, "max", 3.0, 0.5, 5.0)
+    b = _MockXApp("B", 1.0, 0.0, "min", 2.0, 0.3, 0.0)
+    c = _MockXApp("C", 0.5, 1.0, "max", 2.0, 0.2, 4.0)
+    res = CMC(range=(0.0, 5.0), resolution=6).mitigate([a, b, c])
+    assert len(res.per_xapp) == 3
+    # Hand-computed min cost at p1=3 (cost 296) beats p1=2 (496) and p1=0 (1699).
+    assert res.optimal_value == pytest.approx(3.0)
+
+
+def test_cmc_does_not_import_concrete_xapps():
+    import inspect
+
+    import surrogate_xapps.cmc as cmc_mod
+
+    src = inspect.getsource(cmc_mod)
+    assert "CCOxApp" not in src
+    assert "ESxApp" not in src

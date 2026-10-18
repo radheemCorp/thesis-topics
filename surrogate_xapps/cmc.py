@@ -7,7 +7,7 @@ participate in conflict mitigation, plus the CMC itself (added in later phases).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, Sequence, runtime_checkable
 
 import numpy as np
 
@@ -101,7 +101,7 @@ class CMC:
             return kpi >= threshold
         return kpi <= threshold
 
-    def mitigate(self, xapps: list[IQueryableXApp]) -> MitigationResult:
+    def mitigate(self, xapps: Sequence[IQueryableXApp]) -> MitigationResult:
         """Find the QoS-aware compromise ``p*`` over the candidate grid.
 
         Parameters
