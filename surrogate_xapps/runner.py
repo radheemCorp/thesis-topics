@@ -136,14 +136,17 @@ def print_cmc_report(result: dict[str, Any]) -> None:
     )
     print(header)
     print("-" * len(header))
-    req_by_id = {
-        action_cco["xapp_id"]: action_cco["requested_value"][0],
-        action_es["xapp_id"]: action_es["requested_value"][0],
-    }
-    kpi_req_by_id = {
-        action_cco["xapp_id"]: action_cco["predicted_kpi"],
-        action_es["xapp_id"]: action_es["predicted_kpi"],
-    }
+    req_by_id = {}
+    kpi_req_by_id = {}
+    for action in (action_cco, action_es):
+        req_by_id[action["xapp_id"]] = action["requested_value"][0]
+        kpi_req_by_id[action["xapp_id"]] = action["predicted_kpi"]
+    # Also include any other xApps present in mitigation records
+    for rec in mit.per_xapp:
+        xid = rec["xapp_id"]
+        if xid not in req_by_id:
+            req_by_id[xid] = float("nan")
+            kpi_req_by_id[xid] = float("nan")
     for rec in mit.per_xapp:
         xid = rec["xapp_id"]
         print(
