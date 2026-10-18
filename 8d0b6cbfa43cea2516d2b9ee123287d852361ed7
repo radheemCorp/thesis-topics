@@ -1,0 +1,6 @@
+Phase 3 Verification Report
+Automated: CI=true uv run pytest -> 61 passed.
+Scope: 22b23c4..HEAD code files: runner.py, tests/test_cmc.py (all covered).
+Added: run_cmc_demo() integration, print_cmc_report() before/after table, end-to-end verification (p*=-56.69 in [-137.88,-46.97], 2/2 satisfied before->after, IMPROVED).
+Manual verification (user confirmed): before/after table with optimal p* between requests, per-xApp KPI/QoS, satisfied counts, IMPROVED marker.
+User confirmation: Yes, confirmed.
