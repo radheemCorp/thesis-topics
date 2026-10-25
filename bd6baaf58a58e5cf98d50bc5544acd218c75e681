@@ -1,0 +1,15 @@
+Task: run_cmc_demo uses joint range intersection
+
+Changes:
+- run_cmc_demo now intersects each ICP axis across the CCO and ES observed
+  ranges and optimizes the axes that overlap.
+- cmsORAN p2 is 20 for CCO and 60 for ES, so p2 is dropped from the sweep and
+  stays fixed at each xApp's preferred value; the demo remains 1-D on p1.
+- When both axes overlap (synthetic direct datasets), the demo runs a joint
+  2-D sweep.
+- Raises ValueError if no axis overlaps.
+
+Tests: cmsORAN demo returns a 1-D point inside the p1 intersection; a synthetic
+CCO/ES pair with overlapping p1+p2 returns a 2-D point inside both intersections.
+
+Files: surrogate_xapps/runner.py, tests/test_runner_report.py
