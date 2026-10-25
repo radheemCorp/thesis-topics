@@ -1,0 +1,15 @@
+Task: exact_mitigate reference solver
+
+Changes:
+- exact_mitigate() evaluates every candidate point with scalar predict_at
+  calls (no batching/vectorization) and returns the same MitigationResult
+  shape as mitigate().
+- Ties resolve to the lexicographically smallest point, matching the
+  heuristic's deterministic rule.
+- Shares validation, row assembly, and result building with mitigate().
+
+Tests compare exact vs heuristic on 2-app and 3-app analytic instances,
+verify optimize_over is honoured, and reject empty xApp lists, zero-sum
+weights, and negative weights.
+
+Files: surrogate_xapps/cmc.py, tests/test_cmc.py
