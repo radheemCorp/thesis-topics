@@ -379,3 +379,93 @@ def test_cmc_rejects_bad_range_configurations():
         CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=[4])
     with pytest.raises(ValueError):
         CMC(ranges=[(0.0, 1.0)], resolution=1)
+
+
+# --- CMC joint 2-D: analytic sweep ---------------------------------------
+
+class _QuadMock:
+    """Analytic 2-D xApp: KPI is ±squared distance from a peak/valley."""
+
+    def __init__(self, xapp_id, peak, qos_threshold, priority_weight,
+                 objective="max"):
+        self.xapp_id = xapp_id
+        self.peak = (float(peak[0]), float(peak[1]))
+        self.objective = objective
+        self.qos_threshold = qos_threshold
+        self.priority_weight = priority_weight
+
+    @property
+    def preferred_point(self):
+        return self.peak
+
+    def predict_at(self, p1, p2=None):
+        p2v = self.peak[1] if p2 is None else float(p2)
+        value = (float(p1) - self.peak[0]) ** 2 + (p2v - self.peak[1]) ** 2
+        return -value if self.objective == "max" else value
+
+
+def _quad_conflict(objective: str):
+    # Peaks at (0,0) and (4,0). With q=-2 (max) or q=2 (min), zeta=1e3 and
+    # equal weights, the joint cost is 2*(p1-2)^2+4 inside the unsatisfied
+    # band [sqrt(2), 4-sqrt(2)], minimised at p1=2, p2=0 (cost 2000).
+    q = -2.0 if objective == "max" else 2.0
+    return [
+        _QuadMock("A", (0.0, 0.0), q, 0.5, objective),
+        _QuadMock("B", (4.0, 0.0), q, 0.5, objective),
+    ]
+
+
+def test_cmc_joint_2d_finds_known_minimum():
+    cmc = CMC(ranges=[(0.0, 4.0), (-1.0, 1.0)], resolution=[5, 3], zeta=1e3)
+    res = cmc.mitigate(_quad_conflict("max"))
+    assert res.optimal_point == pytest.approx((2.0, 0.0))
+    assert res.n_satisfied_before == 2
+    assert res.n_satisfied_after == 0
+
+
+def test_cmc_joint_2d_handles_min_objective():
+    cmc = CMC(ranges=[(0.0, 4.0), (-1.0, 1.0)], resolution=[5, 3], zeta=1e3)
+    res = cmc.mitigate(_quad_conflict("min"))
+    assert res.optimal_point == pytest.approx((2.0, 0.0))
+    assert res.n_satisfied_before == 2
+    assert res.n_satisfied_after == 0
+
+
+def test_cmc_joint_2d_normalizes_weights():
+    cmc = CMC(ranges=[(0.0, 4.0), (-1.0, 1.0)], resolution=[5, 3], zeta=1e3)
+    scaled = _quad_conflict("max")
+    for xapp in scaled:
+        xapp.priority_weight *= 7.0
+    assert cmc.mitigate(_quad_conflict("max")).optimal_point == pytest.approx(
+        cmc.mitigate(scaled).optimal_point
+    )
+
+
+def test_cmc_legacy_result_exposes_optimal_point():
+    res = CMC(range=(0.0, 5.0), resolution=6).mitigate(_two_conflicting())
+    assert res.optimal_point == pytest.approx((3.0,))
+    assert res.optimal_value == pytest.approx(3.0)
+
+
+# --- BaseXApp batch predictions (used by the joint sweep) -----------------
+
+def test_predict_many_matches_predict_at(trained_cco: CCOxApp):
+    p1s = np.linspace(-100.0, 0.0, 5)
+    p2s = np.linspace(0.0, 50.0, 5)
+    rows = np.column_stack([p1s, p2s])
+    expected = np.array(
+        [trained_cco.predict_at(a, b) for a, b in zip(p1s, p2s)]
+    )
+    assert trained_cco.predict_many(rows) == pytest.approx(expected)
+    assert trained_cco.predict_many(rows[0]).shape == (1,)
+
+
+def test_predict_many_validates_arity_and_training(trained_cco: CCOxApp):
+    from surrogate_xapps.config import CCO_CONFIG
+
+    with pytest.raises(RuntimeError):
+        CCOxApp(CCO_CONFIG).predict_many(np.zeros((1, 2)))
+    with pytest.raises(ValueError):
+        trained_cco.predict_many(np.zeros((2, 3)))
+    with pytest.raises(ValueError):
+        trained_cco.predict_many(np.zeros((2, 2, 2)))

@@ -68,27 +68,58 @@ class IQueryableXApp(Protocol):
         ...
 
 
-@dataclass
+@dataclass(init=False)
 class MitigationResult:
     """Outcome of a CMC mitigation run.
 
     Parameters
     ----------
-    optimal_value:
-        The compromise parameter value ``p*`` minimizing the QACM cost.
+    optimal_point:
+        The compromise point ``p*`` minimizing the QACM cost. Its arity matches
+        the CMC's :attr:`~CMC.ranges`.
     per_xapp:
-        Per-xApp records (``xapp_id``, ``predicted_at_optimum``,
+        Per-xApp records (``xapp_id``, ``preferred_point``,
+        ``predicted_at_preferred``, ``predicted_at_optimum``,
         ``qos_threshold``, ``satisfied_at_optimum``, ``satisfied_before``).
     n_satisfied_before:
         Number of xApps meeting QoS at their own (conflicting) requests.
     n_satisfied_after:
         Number of xApps meeting QoS at the compromise ``p*``.
+    optimal_value:
+        Deprecated 1-D view of ``optimal_point[0]`` (keyword-only).
     """
 
-    optimal_value: float
+    optimal_point: tuple[float, ...]
     per_xapp: list[dict[str, Any]]
     n_satisfied_before: int
     n_satisfied_after: int
+
+    def __init__(
+        self,
+        optimal_point: Sequence[float] | None = None,
+        per_xapp: list[dict[str, Any]] | None = None,
+        n_satisfied_before: int = 0,
+        n_satisfied_after: int = 0,
+        *,
+        optimal_value: float | None = None,
+    ) -> None:
+        if optimal_point is None:
+            if optimal_value is None:
+                raise TypeError("MitigationResult requires 'optimal_point'")
+            optimal_point = (float(optimal_value),)
+        elif optimal_value is not None:
+            raise TypeError(
+                "pass either 'optimal_point' or 'optimal_value', not both"
+            )
+        self.optimal_point = tuple(float(value) for value in optimal_point)
+        self.per_xapp = list(per_xapp) if per_xapp is not None else []
+        self.n_satisfied_before = int(n_satisfied_before)
+        self.n_satisfied_after = int(n_satisfied_after)
+
+    @property
+    def optimal_value(self) -> float:
+        """Deprecated 1-D view: the first coordinate of :attr:`optimal_point`."""
+        return float(self.optimal_point[0])
 
     def improved(self) -> bool:
         """Whether mitigation did not reduce QoS satisfaction (after >= before)."""
@@ -256,72 +287,174 @@ class CMC:
         return kpi <= threshold
 
     def mitigate(self, xapps: Sequence[IQueryableXApp]) -> MitigationResult:
-        """Find the QoS-aware compromise ``p*`` over the candidate grid.
+        """Find the QoS-aware compromise ``p*`` over the joint candidate grid.
 
         Parameters
         ----------
         xapps:
-            Conflicting xApps satisfying :class:`IQueryableXApp` and exposing
-            ``xapp_id``, ``objective``, ``qos_threshold``, ``priority_weight``,
-            and ``preferred_point``.
+            Conflicting xApps satisfying :class:`IQueryableXApp`. The sequence
+            must be non-empty and its priority weights must sum to a positive
+            value.
 
         Returns
         -------
         MitigationResult
-            The optimal compromise and before/after QoS satisfaction.
+            The optimal point and before/after QoS satisfaction.
+
+        Raises
+        ------
+        ValueError
+            If ``xapps`` is empty, a weight is negative, or the weights sum to
+            a non-positive value.
         """
-        # Normalize weights to sum to 1 (QACM constraint).
-        raw = [float(x.priority_weight) for x in xapps]
+        weights = self._validate_xapps(xapps)
+        grid = self.candidate_grid()
+        costs = np.zeros(grid.shape[0], dtype=float)
+        n_satisfied = np.zeros(grid.shape[0], dtype=int)
+
+        for weight, xapp in zip(weights, xapps):
+            kpis = self._predict_grid(xapp, grid)
+            threshold = float(xapp.qos_threshold)
+            if xapp.objective == "max":
+                deviation = np.maximum(0.0, threshold - kpis)
+                satisfied = kpis >= threshold
+            elif xapp.objective == "min":
+                deviation = np.maximum(0.0, kpis - threshold)
+                satisfied = kpis <= threshold
+            else:
+                raise ValueError(
+                    f"unsupported objective {xapp.objective!r}; expected 'max' or 'min'"
+                )
+            costs += weight * deviation * self.zeta
+            n_satisfied += satisfied
+
+        costs -= n_satisfied.astype(float) ** 2
+        best_index = self._select_best(costs)
+        grid_point = grid[best_index]
+        optimal_point = self._assemble_point(grid_point, xapps, weights)
+        return self._build_result(optimal_point, xapps, weights)
+
+    # -- sweep helpers -----------------------------------------------------
+    def _validate_xapps(
+        self, xapps: Sequence[IQueryableXApp]
+    ) -> list[float]:
+        if not xapps:
+            raise ValueError("at least one xApp is required for mitigation")
+        raw = [float(xapp.priority_weight) for xapp in xapps]
+        if any(weight < 0 for weight in raw):
+            raise ValueError("priority weights must be non-negative")
         total = sum(raw)
         if total <= 0:
             raise ValueError("priority weights must sum to a positive value")
-        weights = [w / total for w in raw]
+        return [weight / total for weight in raw]
 
-        lo, hi = self.ranges[0]
-        candidates = np.linspace(lo, hi, self.resolutions[0])
+    def _preferred_row(self, xapp: IQueryableXApp) -> list[float]:
+        """Full preferred ICP vector of an xApp (not truncated to CMC arity)."""
+        preferred = tuple(float(value) for value in xapp.preferred_point)
+        if len(preferred) < self.dimension:
+            raise ValueError(
+                f"xApp {xapp.xapp_id!r} exposes {len(preferred)} ICP(s) "
+                f"but the CMC is {self.dimension}-D"
+            )
+        return list(preferred)
 
-        best_p = float(candidates[0])
-        best_cost = float("inf")
-        for p in candidates:
-            cost = 0.0
-            n_sat = 0
-            for w, x in zip(weights, xapps):
-                u = float(x.predict_at(float(p)))
-                if x.objective == "max":
-                    d = max(0.0, x.qos_threshold - u)
-                else:
-                    d = max(0.0, u - x.qos_threshold)
-                cost += w * d * self.zeta
-                if self._satisfied(u, x.objective, x.qos_threshold):
-                    n_sat += 1
-            cost -= n_sat ** 2
-            if cost < best_cost:
-                best_cost = cost
-                best_p = float(p)
+    def _row_for(self, xapp: IQueryableXApp, point: Sequence[float]) -> list[float]:
+        row = self._preferred_row(xapp)
+        for axis_index in self.optimize_over:
+            row[axis_index] = float(point[axis_index])
+        return row
 
-        # Build per-xApp records and before/after satisfaction counts.
+    def _grid_rows(self, xapp: IQueryableXApp, grid: np.ndarray) -> np.ndarray:
+        preferred = np.asarray(self._preferred_row(xapp), dtype=float)
+        rows = np.tile(preferred, (grid.shape[0], 1))
+        rows[:, list(self.optimize_over)] = grid
+        return rows
+
+    @staticmethod
+    def _predict_row(xapp: IQueryableXApp, row: Sequence[float]) -> float:
+        if len(row) == 1:
+            return float(xapp.predict_at(float(row[0])))
+        if len(row) == 2:
+            return float(xapp.predict_at(float(row[0]), float(row[1])))
+        batch = getattr(xapp, "predict_many", None)
+        if callable(batch):
+            return float(np.asarray(batch(np.asarray([row], dtype=float)))[0])
+        raise TypeError(
+            "xApp must provide predict_many() when optimizing more than two ICPs"
+        )
+
+    def _predict_grid(self, xapp: IQueryableXApp, grid: np.ndarray) -> np.ndarray:
+        rows = self._grid_rows(xapp, grid)
+        batch = getattr(xapp, "predict_many", None)
+        if callable(batch):
+            kpis = np.asarray(batch(rows), dtype=float).reshape(-1)
+            if kpis.shape[0] != rows.shape[0]:
+                raise ValueError(
+                    "predict_many() returned a different number of rows than requested"
+                )
+            return kpis
+        return np.asarray(
+            [self._predict_row(xapp, row) for row in rows], dtype=float
+        )
+
+    @staticmethod
+    def _select_best(costs: np.ndarray) -> int:
+        """Return the first index of the minimum cost (lexicographic tie-break)."""
+        minimum = float(np.min(costs))
+        close = np.flatnonzero(np.isclose(costs, minimum, rtol=0.0, atol=1e-12))
+        return int(close[0])
+
+    def _assemble_point(
+        self,
+        grid_point: np.ndarray,
+        xapps: Sequence[IQueryableXApp],
+        weights: Sequence[float],
+    ) -> tuple[float, ...]:
+        """Combine optimized coordinates with a weighted-mean fixed setting.
+
+        Non-optimized axes are only representative in the returned tuple; each
+        xApp is still queried at its own preferred value on those axes.
+        """
+        preferred = np.asarray(
+            [self._preferred_row(xapp)[: self.dimension] for xapp in xapps],
+            dtype=float,
+        )
+        representative = np.average(preferred, axis=0, weights=weights)
+        representative[list(self.optimize_over)] = grid_point
+        return tuple(float(value) for value in representative)
+
+    def _build_result(
+        self,
+        optimal_point: tuple[float, ...],
+        xapps: Sequence[IQueryableXApp],
+        weights: Sequence[float],
+    ) -> MitigationResult:
         per_xapp: list[dict[str, Any]] = []
-        n_after = 0
         n_before = 0
-        for x in xapps:
-            u_opt = float(x.predict_at(best_p))
-            sat_opt = self._satisfied(u_opt, x.objective, x.qos_threshold)
-            u_before = float(x.predict_at(float(x.preferred_point[0])))
-            sat_before = self._satisfied(u_before, x.objective, x.qos_threshold)
-            n_after += int(sat_opt)
+        n_after = 0
+        for xapp in xapps:
+            preferred = tuple(float(value) for value in xapp.preferred_point)
+            row_at_optimum = self._row_for(xapp, optimal_point)
+            kpi_optimum = self._predict_row(xapp, row_at_optimum)
+            kpi_preferred = self._predict_row(xapp, self._preferred_row(xapp))
+            threshold = float(xapp.qos_threshold)
+            sat_optimum = self._satisfied(kpi_optimum, xapp.objective, threshold)
+            sat_before = self._satisfied(kpi_preferred, xapp.objective, threshold)
             n_before += int(sat_before)
+            n_after += int(sat_optimum)
             per_xapp.append(
                 {
-                    "xapp_id": x.xapp_id,
-                    "predicted_at_optimum": u_opt,
-                    "qos_threshold": float(x.qos_threshold),
-                    "satisfied_at_optimum": sat_opt,
+                    "xapp_id": xapp.xapp_id,
+                    "preferred_point": preferred,
+                    "predicted_at_preferred": kpi_preferred,
+                    "predicted_at_optimum": kpi_optimum,
+                    "qos_threshold": threshold,
+                    "satisfied_at_optimum": sat_optimum,
                     "satisfied_before": sat_before,
                 }
             )
-
         return MitigationResult(
-            optimal_value=best_p,
+            optimal_point=optimal_point,
             per_xapp=per_xapp,
             n_satisfied_before=n_before,
             n_satisfied_after=n_after,

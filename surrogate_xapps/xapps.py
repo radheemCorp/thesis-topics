@@ -162,6 +162,43 @@ class BaseXApp:
         """Predict the KPI for a ``(n, n_features)`` feature matrix."""
         return self.model.predict(np.asarray(X, dtype=float))
 
+    def predict_many(self, points: np.ndarray) -> np.ndarray:
+        """Predict KPIs for a batch of full ICP vectors.
+
+        Parameters
+        ----------
+        points:
+            A single ``(n_features,)`` vector or an ``(n, n_features)`` matrix.
+            Every row must already contain a value for each ICP (the CMC fills
+            non-optimized axes with the xApp's preferred coordinates).
+
+        Returns
+        -------
+        numpy.ndarray
+            One predicted KPI per input row.
+
+        Raises
+        ------
+        RuntimeError
+            If the xApp has not been trained.
+        ValueError
+            If the array is not 1-D/2-D or its column count does not match the
+            dataset feature count.
+        """
+        if self.ranges_ is None:
+            raise RuntimeError("xApp must be trained before predict_many()")
+        array = np.asarray(points, dtype=float)
+        if array.ndim == 1:
+            array = array.reshape(1, -1)
+        if array.ndim != 2:
+            raise ValueError("points must be a 1-D vector or a 2-D matrix")
+        expected = len(self.config.spec.feature_names)
+        if array.shape[1] != expected:
+            raise ValueError(
+                f"expected {expected} feature columns, got {array.shape[1]}"
+            )
+        return self.predict_kpi(array)
+
     def _candidate_grid(self) -> np.ndarray:
         """Build the 2-D candidate grid over the observed parameter ranges."""
         if self.ranges_ is None:
