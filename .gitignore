@@ -11,6 +11,3 @@ htmlcov/
 
 # Generated artifacts
 out/
-
-# Datasets (large; some are nested git repos)
-data/

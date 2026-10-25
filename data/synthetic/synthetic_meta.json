@@ -1,0 +1,44 @@
+{
+  "description": "Synthetic 2D (p1,p2) Gaussian peaks for direct+indirect conflict illustration",
+  "peaks": {
+    "xapp1_direct": {
+      "p1c": -50,
+      "p2c": 20,
+      "A": 1.0,
+      "sigma": 25.0,
+      "objective": "max"
+    },
+    "xapp2_direct": {
+      "p1c": -120,
+      "p2c": 60,
+      "A": 1.0,
+      "sigma": 25.0,
+      "objective": "max"
+    },
+    "xapp3_indirect": {
+      "p1c": -80,
+      "p2c": 40,
+      "A": 1.0,
+      "sigma": 20.0,
+      "objective": "max"
+    },
+    "xapp4_extra": {
+      "p1c": -90,
+      "p2c": 35,
+      "A": 1.0,
+      "sigma": 22.0,
+      "objective": "max"
+    }
+  },
+  "range": {
+    "p1": [
+      -150,
+      50
+    ],
+    "p2": [
+      0,
+      80
+    ]
+  },
+  "layout": "cmsORAN (Input1,Input2,Output)"
+}
