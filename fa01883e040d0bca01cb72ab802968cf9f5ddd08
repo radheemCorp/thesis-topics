@@ -1,0 +1,16 @@
+Task: Extend IQueryableXApp with preferred_point and 2-D predict_at
+
+Changes:
+- IQueryableXApp now exposes read-only properties (xapp_id, objective,
+  qos_threshold, priority_weight, preferred_point) and
+  predict_at(p1, p2=None).
+- BaseXApp gains a cached preferred_point (full uncoordinated optimum);
+  preferred_value is now a deprecated 1-D view over it.
+- CMC.mitigate uses preferred_point[0] for the legacy 'before' KPI.
+- Added protocol tests for preferred_point presence and optional p2.
+
+Why:
+- q2/know location alone is insufficient: the CMC must be able to query
+  full 2-D points and compare against each xApp's real uncoordinated optimum.
+
+Files: surrogate_xapps/cmc.py, surrogate_xapps/xapps.py, tests/test_cmc.py
