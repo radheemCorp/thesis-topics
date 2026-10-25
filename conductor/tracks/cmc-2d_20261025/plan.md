@@ -75,7 +75,16 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: `run_cmc_demo` uses joint range intersection — bd6baaf
   - [x] Write failing tests: the demo's `p*` lies within the intersection of both xApps' observed ranges on each axis.
   - [x] Update `surrogate_xapps/runner.py`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) [checkpoint: PENDING]
+
+### Phase 3 verification report (2026-10-25)
+
+- **Scope:** `e53179b..HEAD` — `surrogate_xapps/runner.py`, `cli/cli.py`, `tests/test_runner_report.py`, `tests/test_cli_scenarios.py`.
+- **Tests:** `uv run pytest -q` → 105 passed.
+- **Coverage:** 95% total (`runner.py` 99%, `cmc.py` 95%, `xapps.py` 90%).
+- **Manual checks:** joint CLI prints `p*=(p1=-98.39, p2=41.29)` with `2/2` satisfied; `--optimize-over p1` prints one coordinate and `1/2` satisfied (xApp1 at 0.324 < 0.35); `--optimize-over p2` prints one coordinate; 4-app joint run lists all four xApps with real requests and no `nan`.
+- **Demo:** cmsORAN drops non-overlapping p2 (20 vs 60) and optimizes the p1 intersection; synthetic overlapping data runs joint 2-D.
+- **Deviations:** none.
 
 ## Phase 4 — Synthetic Scenarios & Test Coverage
 
