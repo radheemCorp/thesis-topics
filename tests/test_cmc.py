@@ -536,3 +536,39 @@ def test_optimize_over_rejects_out_of_range_indices():
     with pytest.raises(ValueError):
         CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=4,
             optimize_over=[0, 0])
+
+
+# --- Dimension-aware MitigationResult ------------------------------------
+
+def test_mitigation_result_2d_fields():
+    xapps = _quad_conflict("max")
+    res = CMC(
+        ranges=[(0.0, 4.0), (-1.0, 1.0)], resolution=[5, 3]
+    ).mitigate(xapps)
+    assert isinstance(res.optimal_point, tuple)
+    assert len(res.optimal_point) == 2
+    assert res.optimal_value == pytest.approx(res.optimal_point[0])
+    by_id = {x.xapp_id: x for x in xapps}
+    for record in res.per_xapp:
+        assert len(record["preferred_point"]) == 2
+        xapp = by_id[record["xapp_id"]]
+        assert record["predicted_at_preferred"] == pytest.approx(
+            xapp.predict_at(*record["preferred_point"])
+        )
+        assert record["satisfied_before"] is (
+            record["predicted_at_preferred"] >= record["qos_threshold"]
+        )
+
+
+def test_mitigation_result_rejects_conflicting_optimal_forms():
+    with pytest.raises(TypeError):
+        MitigationResult()
+    with pytest.raises(TypeError):
+        MitigationResult(optimal_point=(1.0,), optimal_value=1.0)
+
+
+def test_mitigation_result_legacy_optimal_value_sets_point():
+    res = MitigationResult(optimal_value=2.5, per_xapp=[], n_satisfied_before=0,
+                           n_satisfied_after=0)
+    assert res.optimal_point == (2.5,)
+    assert res.optimal_value == 2.5
