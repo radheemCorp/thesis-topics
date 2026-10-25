@@ -66,9 +66,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 3 — Runner, Report, and CLI
 
-- [ ] Task: Dimension-aware report
-  - [ ] Write failing tests: `print_cmc_report(result, actions=...)` prints `p* = (p1, p2)` and each xApp's requested point; no `nan` values for 3rd/4th xApps.
-  - [ ] Refactor `print_cmc_report` to accept the full action list while keeping the legacy two-action call valid.
+- [x] Task: Dimension-aware report — 77634e7
+  - [x] Write failing tests: `print_cmc_report(result, actions=...)` prints `p* = (p1, p2)` and each xApp's requested point; no `nan` values for 3rd/4th xApps.
+  - [x] Refactor `print_cmc_report` to accept the full action list while keeping the legacy two-action call valid.
 - [ ] Task: CLI joint/1-D selection and per-axis resolution
   - [ ] Write failing tests: `--optimize-over joint|p1|p2` changes the printed `p*` dimension; `--cmc-resolution` accepts one or two values.
   - [ ] Implement the arguments in `cli/cli.py` and thread them to `CMC`.
