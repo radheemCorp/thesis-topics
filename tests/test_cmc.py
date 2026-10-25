@@ -572,3 +572,62 @@ def test_mitigation_result_legacy_optimal_value_sets_point():
                            n_satisfied_after=0)
     assert res.optimal_point == (2.5,)
     assert res.optimal_value == 2.5
+
+
+# --- Exact reference solver ----------------------------------------------
+
+def _independent_cost(cmc, xapps, result):
+    total = 0.0
+    for xapp, record in zip(xapps, result.per_xapp):
+        kpi = record["predicted_at_optimum"]
+        if xapp.objective == "max":
+            deviation = max(0.0, xapp.qos_threshold - kpi)
+        else:
+            deviation = max(0.0, kpi - xapp.qos_threshold)
+        total += xapp.priority_weight * deviation * cmc.zeta
+    return total - result.n_satisfied_after ** 2
+
+
+def test_exact_matches_heuristic_on_small_2d_instance():
+    xapps = _quad_conflict("max")
+    cmc = CMC(ranges=[(0.0, 4.0), (-1.0, 1.0)], resolution=[5, 3])
+    heuristic = cmc.mitigate(xapps)
+    exact = cmc.exact_mitigate(xapps)
+    assert exact.optimal_point == pytest.approx(heuristic.optimal_point)
+    assert _independent_cost(cmc, xapps, exact) == pytest.approx(
+        _independent_cost(cmc, xapps, heuristic)
+    )
+
+
+def test_exact_matches_heuristic_with_three_xapps():
+    xapps = _quad_conflict("max") + [
+        _QuadMock("C", (2.0, 0.5), -2.0, 0.33, "max")
+    ]
+    cmc = CMC(ranges=[(0.0, 4.0), (-1.0, 1.0)], resolution=[5, 3])
+    assert cmc.exact_mitigate(xapps).optimal_point == pytest.approx(
+        cmc.mitigate(xapps).optimal_point
+    )
+
+
+def test_exact_honours_optimize_over():
+    cmc = CMC(
+        ranges=[(0.0, 0.0), (0.0, 5.0)],
+        resolution=[2, 6],
+        optimize_over=[1],
+    )
+    xapps = _p2_conflict()
+    assert cmc.exact_mitigate(xapps).optimal_point == pytest.approx(
+        cmc.mitigate(xapps).optimal_point
+    )
+
+
+def test_exact_rejects_empty_and_bad_weights():
+    cmc = CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=4)
+    with pytest.raises(ValueError):
+        cmc.exact_mitigate([])
+    zero = _QuadMock("Z", (0.0, 0.0), -1.0, 0.0)
+    with pytest.raises(ValueError):
+        cmc.exact_mitigate([zero])
+    negative = _QuadMock("N", (0.0, 0.0), -1.0, -1.0)
+    with pytest.raises(ValueError):
+        cmc.exact_mitigate([negative])

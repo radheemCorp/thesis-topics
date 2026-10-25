@@ -334,6 +334,68 @@ class CMC:
         optimal_point = self._assemble_point(grid_point, xapps, weights)
         return self._build_result(optimal_point, xapps, weights)
 
+    def exact_mitigate(self, xapps: Sequence[IQueryableXApp]) -> MitigationResult:
+        """Brute-force reference solver over the same candidate grid.
+
+        Unlike :meth:`mitigate`, this evaluates every point with a scalar
+        ``predict_at`` call (no vectorized shortcuts) and resolves ties by the
+        lexicographically smallest point. It is intended as a test oracle for
+        small grids, not as the production path.
+
+        Parameters
+        ----------
+        xapps:
+            Conflicting xApps satisfying :class:`IQueryableXApp`.
+
+        Returns
+        -------
+        MitigationResult
+            Same shape as :meth:`mitigate`.
+
+        Raises
+        ------
+        ValueError
+            If ``xapps`` is empty or its weights cannot be normalized.
+        """
+        weights = self._validate_xapps(xapps)
+        grid = self.candidate_grid()
+        best_point: tuple[float, ...] | None = None
+        best_cost = math.inf
+
+        for grid_point in grid:
+            point = self._assemble_point(grid_point, xapps, weights)
+            cost = 0.0
+            n_satisfied = 0
+            for weight, xapp in zip(weights, xapps):
+                kpi = self._predict_row(xapp, self._row_for(xapp, point))
+                threshold = float(xapp.qos_threshold)
+                if xapp.objective == "max":
+                    deviation = max(0.0, threshold - kpi)
+                    satisfied = kpi >= threshold
+                elif xapp.objective == "min":
+                    deviation = max(0.0, kpi - threshold)
+                    satisfied = kpi <= threshold
+                else:
+                    raise ValueError(
+                        f"unsupported objective {xapp.objective!r}; "
+                        "expected 'max' or 'min'"
+                    )
+                cost += weight * deviation * self.zeta
+                n_satisfied += int(satisfied)
+            cost -= n_satisfied ** 2
+
+            candidate = tuple(float(value) for value in point)
+            if cost < best_cost - 1e-12 or (
+                abs(cost - best_cost) <= 1e-12
+                and (best_point is None or candidate < best_point)
+            ):
+                best_cost = cost
+                best_point = candidate
+
+        if best_point is None:  # pragma: no cover - grid is never empty
+            raise ValueError("candidate grid is empty")
+        return self._build_result(best_point, xapps, weights)
+
     # -- sweep helpers -----------------------------------------------------
     def _validate_xapps(
         self, xapps: Sequence[IQueryableXApp]
