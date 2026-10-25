@@ -35,9 +35,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 2 — Joint 2-D CMC Core & Exact Oracle
 
-- [ ] Task: Multi-axis range parsing and joint candidate grid
-  - [ ] Write failing tests: legacy `range=(lo, hi)` is treated as one axis; `ranges=[(lo1,hi1),(lo2,hi2)]` produces the Cartesian product; per-axis `resolution` is respected.
-  - [ ] Implement range normalization and `np.meshgrid(..., indexing="ij")` grid construction in `surrogate_xapps/cmc.py`.
+- [x] Task: Multi-axis range parsing and joint candidate grid — ed35b73
+  - [x] Write failing tests: legacy `range=(lo, hi)` is treated as one axis; `ranges=[(lo1,hi1),(lo2,hi2)]` produces the Cartesian product; per-axis `resolution` is respected.
+  - [x] Implement range normalization and `np.meshgrid(..., indexing="ij")` grid construction in `surrogate_xapps/cmc.py`.
 - [ ] Task: Joint 2-D sweep with the unchanged QACM cost
   - [ ] Write failing tests with analytic 2-D mocks (known minimum): optimum is found; both `max` and `min` objectives work; weights are normalized.
   - [ ] Implement the sweep and return `optimal_point`.
