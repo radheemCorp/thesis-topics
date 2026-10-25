@@ -50,9 +50,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: `exact_mitigate` reference solver — afc103b
   - [x] Write failing tests: heuristic cost equals exact cost on small 2–3 xApp analytic instances; exact solver rejects empty xApps and unnormalizable weights.
   - [x] Implement the brute-force oracle in `surrogate_xapps/cmc.py` (numpy only).
-- [ ] Task: Deterministic tie-break and complexity guard
-  - [ ] Write failing tests: equal-cost plateaus resolve to the lexicographically smallest point; a grid above the configured cap raises/warns with an actionable message.
-  - [ ] Implement the tie-break rule and cap check.
+- [x] Task: Deterministic tie-break and complexity guard — 961fd10
+  - [x] Write failing tests: equal-cost plateaus resolve to the lexicographically smallest point; a grid above the configured cap raises/warns with an actionable message.
+  - [x] Implement the tie-break rule and cap check.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3 — Runner, Report, and CLI
