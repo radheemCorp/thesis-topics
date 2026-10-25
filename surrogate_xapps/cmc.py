@@ -6,6 +6,7 @@ participate in conflict mitigation, plus the CMC itself (added in later phases).
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Any, Protocol, Sequence, runtime_checkable
 
@@ -95,28 +96,158 @@ class MitigationResult:
 
 
 class CMC:
-    """QACM Conflict Mitigation Controller (discrete heuristic, Algorithm 1).
+    """QACM Conflict Mitigation Controller (discrete joint grid heuristic).
 
-    Sweeps a discrete grid of candidate values for the shared ICP, queries each
-    conflicting xApp's predicted KPI, and returns the compromise ``p*`` that
-    minimizes the QACM cost ``Σ w_i·d_i·ζ − (Σ s_i)²``.
+    Sweeps a discrete grid over the shared Input Control Parameters (ICPs),
+    queries each conflicting xApp's predicted KPI, and returns the compromise
+    point ``p*`` that minimizes the QACM cost
+    ``Σ_i w_i·d_i·ζ − (Σ_i s_i)²``.
 
     Parameters
     ----------
-    range:
-        ``(lo, hi)`` bounds for the shared Input Control Parameter.
+    ranges:
+        Either a legacy ``(lo, hi)`` pair for a single ICP, or a sequence of
+        ``(lo, hi)`` pairs, one per ICP.
     resolution:
-        Number of discrete candidate points across ``range``.
+        Number of candidate points per axis. An ``int`` applies to every axis;
+        a sequence specifies each axis independently (default ``128``).
     zeta:
         Tuning constant scaling the weighted QoS deviation (default ``1e3``).
+    optimize_over:
+        ICP indices to sweep. ``None`` optimizes the first two ICPs (or the
+        only ICP for 1-D). Non-optimized ICPs are held at each xApp's own
+        :attr:`~surrogate_xapps.cmc.IQueryableXApp.preferred_point`.
+    range:
+        Deprecated keyword alias for a 1-D ``ranges`` pair.
+
+    Notes
+    -----
+    The grid is the Cartesian product of per-axis ``linspace`` samples, laid
+    out in lexicographic order so that cost ties resolve deterministically to
+    the lexicographically smallest point. Grids larger than
+    :attr:`MAX_GRID_POINTS` are rejected before allocation.
     """
 
-    def __init__(self, range: tuple[float, float], resolution: int, zeta: float = 1e3):
-        if resolution < 2:
-            raise ValueError("resolution must be >= 2")
-        self.range = (float(range[0]), float(range[1]))
-        self.resolution = resolution
+    MAX_GRID_POINTS = 1_000_000
+
+    def __init__(
+        self,
+        ranges: Sequence[tuple[float, float]] | tuple[float, float] | None = None,
+        resolution: int | Sequence[int] = 128,
+        zeta: float = 1e3,
+        optimize_over: Sequence[int] | None = None,
+        *,
+        range: tuple[float, float] | None = None,
+    ):
+        if ranges is None and range is None:
+            raise TypeError("CMC requires 'ranges' (or the legacy 'range')")
+        if ranges is not None and range is not None:
+            raise TypeError("pass either 'ranges' or 'range', not both")
+        if ranges is None:
+            ranges = range
+
+        axes = self._normalize_ranges(ranges)
+        resolutions = self._normalize_resolutions(resolution, len(axes))
+        optimize = self._normalize_optimize_over(optimize_over, len(axes))
+        self._check_grid_size(resolutions, optimize)
+
+        self.ranges = tuple(axes)
+        self.resolutions = tuple(resolutions)
+        self.resolution = resolution  # legacy attribute (int for 1-D callers)
+        self.optimize_over = optimize
         self.zeta = float(zeta)
+
+    # -- construction helpers ---------------------------------------------
+    @staticmethod
+    def _normalize_ranges(
+        ranges: Sequence[tuple[float, float]] | tuple[float, float],
+    ) -> list[tuple[float, float]]:
+        seq = list(ranges)
+        if not seq:
+            raise ValueError("ranges must contain at least one (lo, hi) pair")
+        if len(seq) == 2 and not isinstance(seq[0], (tuple, list, np.ndarray)):
+            pairs = [(seq[0], seq[1])]
+        else:
+            pairs = []
+            for item in seq:
+                if len(item) != 2:
+                    raise ValueError("each range must be a (lo, hi) pair")
+                pairs.append((item[0], item[1]))
+        normalized = []
+        for lo, hi in pairs:
+            lo_f, hi_f = float(lo), float(hi)
+            if not (math.isfinite(lo_f) and math.isfinite(hi_f)):
+                raise ValueError("range bounds must be finite")
+            if lo_f > hi_f:
+                raise ValueError(f"invalid range ({lo_f}, {hi_f}): lo > hi")
+            normalized.append((lo_f, hi_f))
+        return normalized
+
+    @staticmethod
+    def _normalize_resolutions(
+        resolution: int | Sequence[int], dimension: int
+    ) -> list[int]:
+        if isinstance(resolution, (int, np.integer)):
+            values = [int(resolution)] * dimension
+        else:
+            values = [int(value) for value in resolution]
+            if len(values) != dimension:
+                raise ValueError(
+                    f"resolution has {len(values)} entries but ranges has "
+                    f"{dimension} axes"
+                )
+        if any(value < 2 for value in values):
+            raise ValueError("each resolution must be >= 2")
+        return values
+
+    @staticmethod
+    def _normalize_optimize_over(
+        optimize_over: Sequence[int] | None, dimension: int
+    ) -> tuple[int, ...]:
+        queryable = min(dimension, 2)
+        if optimize_over is None:
+            return tuple(range(queryable))
+        indices = tuple(int(index) for index in optimize_over)
+        if not indices:
+            raise ValueError("optimize_over must contain at least one index")
+        if len(set(indices)) != len(indices):
+            raise ValueError("optimize_over contains duplicate indices")
+        for index in indices:
+            if index < 0 or index >= queryable:
+                raise ValueError(
+                    f"optimize_over index {index} is out of range; "
+                    f"predict_at exposes the first {queryable} ICP(s)"
+                )
+        return tuple(sorted(indices))
+
+    def _check_grid_size(
+        self, resolutions: Sequence[int], optimize: Sequence[int]
+    ) -> None:
+        size = math.prod(resolutions[index] for index in optimize)
+        if size > self.MAX_GRID_POINTS:
+            raise ValueError(
+                f"candidate grid has {size} points (limit {self.MAX_GRID_POINTS}); "
+                "reduce resolution or restrict optimize_over"
+            )
+
+    @property
+    def dimension(self) -> int:
+        """Number of Input Control Parameters covered by :attr:`ranges`."""
+        return len(self.ranges)
+
+    def candidate_grid(self) -> np.ndarray:
+        """Return the ``(n_points, n_optimized)`` candidate grid.
+
+        Points are ordered lexicographically: the first optimized axis varies
+        slowest, matching ``np.meshgrid(..., indexing="ij")`` + ``ravel``.
+        """
+        axes = [
+            np.linspace(lo, hi, self.resolutions[index])
+            for index, (lo, hi) in enumerate(self.ranges)
+            if index in self.optimize_over
+        ]
+        mesh = np.meshgrid(*axes, indexing="ij")
+        return np.stack([axis.ravel() for axis in mesh], axis=1)
 
     def _satisfied(self, kpi: float, objective: str, threshold: float) -> bool:
         """QoS satisfaction for a predicted KPI (mirrors BaseXApp.qos_satisfied)."""
@@ -146,8 +277,8 @@ class CMC:
             raise ValueError("priority weights must sum to a positive value")
         weights = [w / total for w in raw]
 
-        lo, hi = self.range
-        candidates = np.linspace(lo, hi, self.resolution)
+        lo, hi = self.ranges[0]
+        candidates = np.linspace(lo, hi, self.resolutions[0])
 
         best_p = float(candidates[0])
         best_cost = float("inf")

@@ -338,3 +338,44 @@ def test_print_cmc_report_shows_optimum(cco_file: Path, es_file: Path, capsys):
     print_cmc_report(result)
     out = capsys.readouterr().out
     assert "optimal" in out.lower() or "p*" in out
+
+
+# --- CMC joint 2-D: range parsing and candidate grid ---------------------
+
+def test_cmc_legacy_range_is_one_dimension():
+    cmc = CMC(range=(0.0, 5.0), resolution=6)
+    assert cmc.ranges == ((0.0, 5.0),)
+    assert cmc.dimension == 1
+    grid = cmc.candidate_grid()
+    assert grid.shape == (6, 1)
+    assert grid[:, 0] == pytest.approx([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+
+
+def test_cmc_ranges_build_cartesian_product():
+    cmc = CMC(ranges=[(0.0, 1.0), (10.0, 20.0)], resolution=[2, 3])
+    assert cmc.ranges == ((0.0, 1.0), (10.0, 20.0))
+    assert cmc.dimension == 2
+    grid = cmc.candidate_grid()
+    assert grid.shape == (6, 2)
+    # meshgrid(indexing="ij") ravel is lexicographic: first axis slowest.
+    assert grid[:, 0] == pytest.approx([0.0, 0.0, 0.0, 1.0, 1.0, 1.0])
+    assert grid[:, 1] == pytest.approx([10.0, 15.0, 20.0, 10.0, 15.0, 20.0])
+
+
+def test_cmc_int_resolution_applies_per_axis():
+    cmc = CMC(ranges=[(0.0, 1.0), (0.0, 2.0)], resolution=4)
+    assert cmc.resolutions == (4, 4)
+    assert cmc.candidate_grid().shape == (16, 2)
+
+
+def test_cmc_rejects_bad_range_configurations():
+    with pytest.raises(TypeError):
+        CMC(resolution=4)
+    with pytest.raises(TypeError):
+        CMC(ranges=[(0.0, 1.0)], range=(0.0, 1.0), resolution=4)
+    with pytest.raises(ValueError):
+        CMC(ranges=[(5.0, 0.0)], resolution=4)
+    with pytest.raises(ValueError):
+        CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=[4])
+    with pytest.raises(ValueError):
+        CMC(ranges=[(0.0, 1.0)], resolution=1)
