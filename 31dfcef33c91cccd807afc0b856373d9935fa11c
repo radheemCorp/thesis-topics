@@ -1,0 +1,12 @@
+Task: Dimension-aware MitigationResult
+
+The dataclass changes landed with 0d9bebb; this commit pins their contract:
+
+- optimal_point arity matches the CMC ranges (2-D here).
+- optimal_value is the deprecated first-coordinate view.
+- per_xapp carries preferred_point and predicted_at_preferred.
+- satisfied_before agrees with predict_at(*preferred_point).
+- Legacy optimal_value= construction still works; passing both forms (or
+  neither) raises TypeError.
+
+Files: tests/test_cmc.py
