@@ -96,6 +96,7 @@ class BaseXApp:
         self.config = config
         self.model: SurrogateModel = model if model is not None else build_model(config)
         self.ranges_: dict[str, tuple[float, float]] | None = None
+        self._preferred_point: tuple[float, ...] | None = None
 
     # -- IQueryableXApp metadata (flat accessors over config) --------------
     @property
@@ -119,9 +120,25 @@ class BaseXApp:
         return float(self.config.priority_weight)
 
     @property
+    def preferred_point(self) -> tuple[float, ...]:
+        """This xApp's own optimal point over all ICPs (uncoordinated request).
+
+        Computed once from :meth:`infer_action` and cached until the next
+        :meth:`train` call. The CMC uses this as the "before" reference and as
+        the fixed coordinates for any ICP it is not optimizing.
+        """
+        if self.ranges_ is None:
+            raise RuntimeError("xApp must be trained before preferred_point")
+        if self._preferred_point is None:
+            self._preferred_point = tuple(
+                float(v) for v in self.infer_action()["requested_value"]
+            )
+        return self._preferred_point
+
+    @property
     def preferred_value(self) -> float:
-        """This xApp's own optimal ``p1`` (its uncoordinated request)."""
-        return float(self.infer_action()["requested_value"][0])
+        """Deprecated 1-D view of :attr:`preferred_point` (first ICP only)."""
+        return float(self.preferred_point[0])
 
     # -- training ---------------------------------------------------------
     def train(self: XAppT, X: np.ndarray, y: np.ndarray) -> XAppT:
@@ -137,6 +154,7 @@ class BaseXApp:
             name: (float(X[:, i].min()), float(X[:, i].max()))
             for i, name in enumerate(self.config.spec.feature_names)
         }
+        self._preferred_point = None
         return self
 
     # -- inference --------------------------------------------------------

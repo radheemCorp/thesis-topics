@@ -22,24 +22,47 @@ class IQueryableXApp(Protocol):
     (QACM's no-data-sharing requirement).
     """
 
-    xapp_id: str
-    objective: str
-    qos_threshold: float
-    priority_weight: float
-    preferred_value: float
+    @property
+    def xapp_id(self) -> str:
+        """Identifier of the xApp."""
+        ...
 
-    def predict_at(self, p1: float) -> float:
-        """Return the predicted KPI if this xApp is forced to use ``p1``.
+    @property
+    def objective(self) -> str:
+        """``"max"`` or ``"min"``."""
+        ...
+
+    @property
+    def qos_threshold(self) -> float:
+        """QoS threshold for the predicted KPI."""
+        ...
+
+    @property
+    def priority_weight(self) -> float:
+        """Relative priority weight used by the CMC."""
+        ...
+
+    @property
+    def preferred_point(self) -> tuple[float, ...]:
+        """The xApp's own uncoordinated optimum over all ICPs."""
+        ...
+
+    def predict_at(self, p1: float, p2: float | None = None) -> float:
+        """Return the predicted KPI if this xApp is forced to use ``(p1, p2)``.
 
         Parameters
         ----------
         p1:
-            The value of the shared Input Control Parameter.
+            The value of the first Input Control Parameter.
+        p2:
+            The value of the second Input Control Parameter. When omitted, the
+            xApp should use its own preferred ``p2`` (not a dataset extreme),
+            so the result agrees with its uncoordinated request.
 
         Returns
         -------
         float
-            The predicted KPI at ``p1``.
+            The predicted KPI at the requested point.
         """
         ...
 
@@ -109,7 +132,7 @@ class CMC:
         xapps:
             Conflicting xApps satisfying :class:`IQueryableXApp` and exposing
             ``xapp_id``, ``objective``, ``qos_threshold``, ``priority_weight``,
-            and ``preferred_value``.
+            and ``preferred_point``.
 
         Returns
         -------
@@ -152,7 +175,7 @@ class CMC:
         for x in xapps:
             u_opt = float(x.predict_at(best_p))
             sat_opt = self._satisfied(u_opt, x.objective, x.qos_threshold)
-            u_before = float(x.predict_at(float(x.preferred_value)))
+            u_before = float(x.predict_at(float(x.preferred_point[0])))
             sat_before = self._satisfied(u_before, x.objective, x.qos_threshold)
             n_after += int(sat_opt)
             n_before += int(sat_before)

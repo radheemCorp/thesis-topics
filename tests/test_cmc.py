@@ -42,7 +42,11 @@ class _MockXApp:
         self.preferred_value = preferred_value
         self.p2_const = p2_const
 
-    def predict_at(self, p1: float) -> float:
+    @property
+    def preferred_point(self) -> tuple[float, ...]:
+        return (self.preferred_value, self.p2_const)
+
+    def predict_at(self, p1: float, p2: float | None = None) -> float:
         return self.slope * p1 + self.intercept
 
 
@@ -61,6 +65,35 @@ def test_protocol_predict_at_returns_float():
     xapp = _MockXApp("x", 1.0, 0.0, "max", 0.5, 0.5)
     result = xapp.predict_at(1.0)
     assert isinstance(result, float)
+
+
+def test_protocol_requires_preferred_point():
+    class NoPreferredPoint:
+        xapp_id = "x"
+        objective = "max"
+        qos_threshold = 0.5
+        priority_weight = 0.5
+
+        def predict_at(self, p1, p2=None):
+            return p1
+
+    assert not isinstance(NoPreferredPoint(), IQueryableXApp)
+
+
+def test_protocol_accepts_preferred_point_and_optional_p2():
+    class TwoDimensional:
+        xapp_id = "x"
+        objective = "max"
+        qos_threshold = 0.5
+        priority_weight = 0.5
+        preferred_point = (0.0, 0.0)
+
+        def predict_at(self, p1, p2=None):
+            return p1 + (p2 or 0.0)
+
+    xapp = TwoDimensional()
+    assert isinstance(xapp, IQueryableXApp)
+    assert xapp.predict_at(1.0, 2.0) == pytest.approx(3.0)
 
 
 # --- BaseXApp.predict_at adapter -------------------------------------------
