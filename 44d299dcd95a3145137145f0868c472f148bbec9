@@ -1,0 +1,13 @@
+Task: Update existing mocks to the extended protocol
+
+Changes:
+- _MockXApp exposes preferred_point and predict_at(p1, p2=None).
+- Added an optional p2_slope so tests can exercise 2-D querying; default 0.0
+  preserves every pre-existing scalar expectation.
+- Added a test covering the preferred-p2 default and an explicit p2 override.
+
+Why:
+- The shared mock is used by the CMC tests; it must satisfy the new protocol
+  without perturbing existing cost/optimum assertions.
+
+Files: tests/test_cmc.py
