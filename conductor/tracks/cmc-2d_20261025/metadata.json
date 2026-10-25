@@ -1,0 +1,8 @@
+{
+  "track_id": "cmc-2d_20261025",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-10-25T00:00:00Z",
+  "updated_at": "2026-10-25T00:00:00Z",
+  "description": "Extend the QACM CMC from a scalar p1 sweep to joint 2-D (p1,p2) mitigation with a dimension-aware IQueryableXApp protocol, an exact brute-force test oracle, and synthetic direct + indirect conflict coverage"
+}
