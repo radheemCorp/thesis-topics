@@ -1,0 +1,15 @@
+Task: Multi-axis range parsing and joint candidate grid
+
+Changes:
+- CMC now accepts legacy (lo, hi) or a sequence of per-axis pairs.
+- Per-axis resolution (int broadcast or sequence), validated against arity.
+- optimize_over normalization (default: first two ICPs) and grid-size cap
+  (MAX_GRID_POINTS=1,000,000) checked before allocation.
+- candidate_grid() builds the Cartesian product with meshgrid(indexing='ij'),
+  whose ravel order is lexicographic for ascending axes.
+- Legacy 1-D mitigate path adapted to the normalized ranges/resolutions.
+
+Tests: legacy 1-D range, 2-D product ordering, per-axis resolution, and
+invalid configurations (missing/duplicate range, lo>hi, wrong arity, res<2).
+
+Files: surrogate_xapps/cmc.py, tests/test_cmc.py
