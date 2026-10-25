@@ -14,9 +14,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Capture current 1-D behavior as regression fixtures — e30180a
   - [x] Write tests that pin `optimal_value`, per-xApp `satisfied_before`, and `improved()` for the cmsORAN CCO/ES demo and one synthetic 2-app run.
   - [x] Run the suite and record the baseline values in the test docstrings.
-- [ ] Task: Extend `IQueryableXApp` with `preferred_point` and 2-D `predict_at`
-  - [ ] Write failing tests: a mock exposing `preferred_point` and `predict_at(p1, p2=None)` satisfies the protocol; a 1-arg mock still satisfies it.
-  - [ ] Update the protocol in `surrogate_xapps/cmc.py`; keep `preferred_value` as a deprecated property.
+- [x] Task: Extend `IQueryableXApp` with `preferred_point` and 2-D `predict_at` — fa01883
+  - [x] Write failing tests: a mock exposing `preferred_point` and `predict_at(p1, p2=None)` satisfies the protocol; a 1-arg mock still satisfies it.
+  - [x] Update the protocol in `surrogate_xapps/cmc.py`; keep `preferred_value` as a deprecated property.
 - [ ] Task: Add `preferred_point` and `predict_at(p1, p2=None)` to `BaseXApp`
   - [ ] Write failing tests: `predict_at(*x.preferred_point) ≈ x.infer_action()["predicted_kpi"]`; `p2=None` uses the preferred `p2`, not `ranges_` minimum; untrained xApp raises a clear error.
   - [ ] Implement both members in `surrogate_xapps/xapps.py`.
