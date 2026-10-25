@@ -17,12 +17,12 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Extend `IQueryableXApp` with `preferred_point` and 2-D `predict_at` — fa01883
   - [x] Write failing tests: a mock exposing `preferred_point` and `predict_at(p1, p2=None)` satisfies the protocol; a 1-arg mock still satisfies it.
   - [x] Update the protocol in `surrogate_xapps/cmc.py`; keep `preferred_value` as a deprecated property.
-- [ ] Task: Add `preferred_point` and `predict_at(p1, p2=None)` to `BaseXApp`
-  - [ ] Write failing tests: `predict_at(*x.preferred_point) ≈ x.infer_action()["predicted_kpi"]`; `p2=None` uses the preferred `p2`, not `ranges_` minimum; untrained xApp raises a clear error.
-  - [ ] Implement both members in `surrogate_xapps/xapps.py`.
-- [ ] Task: Update existing mocks to the extended protocol
-  - [ ] Update `_MockXApp` in `tests/test_cmc.py` to expose `preferred_point` and accept an optional `p2`.
-  - [ ] Confirm the pre-existing 20 CMC tests still pass.
+- [x] Task: Add `preferred_point` and `predict_at(p1, p2=None)` to `BaseXApp` — f9960fb
+  - [x] Write failing tests: `predict_at(*x.preferred_point) ≈ x.infer_action()["predicted_kpi"]`; `p2=None` uses the preferred `p2`, not `ranges_` minimum; untrained xApp raises a clear error.
+  - [x] Implement both members in `surrogate_xapps/xapps.py`.
+- [x] Task: Update existing mocks to the extended protocol — 44d299d
+  - [x] Update `_MockXApp` in `tests/test_cmc.py` to expose `preferred_point` and accept an optional `p2`.
+  - [x] Confirm the pre-existing 20 CMC tests still pass.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2 — Joint 2-D CMC Core & Exact Oracle
