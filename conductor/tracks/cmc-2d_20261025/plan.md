@@ -53,7 +53,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Deterministic tie-break and complexity guard — 961fd10
   - [x] Write failing tests: equal-cost plateaus resolve to the lexicographically smallest point; a grid above the configured cap raises/warns with an actionable message.
   - [x] Implement the tie-break rule and cap check.
-- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) [checkpoint: PENDING]
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) [checkpoint: e53179b]
 
 ### Phase 2 verification report (2026-10-25)
 
