@@ -80,3 +80,35 @@ def test_report_legacy_two_action_result_still_works(cco_file: Path, es_file: Pa
     assert "xApp_ES" in out
     assert "p* = (" in out
     assert "nan" not in out.lower()
+
+
+# --- run_cmc_demo range intersection -------------------------------------
+
+def test_demo_optimizes_only_shared_axes(cco_file: Path, es_file: Path):
+    result = run_cmc_demo(
+        cco_file=cco_file, es_file=es_file, resolution=60, cmc_resolution=60
+    )
+    mitigation = result["mitigation"]
+    cco, es = result["cco"], result["es"]
+    # cmsORAN: p1 is shared, but p2 is 20 for CCO and 60 for ES, so p2 has no
+    # intersection and must stay fixed at each xApp's preferred value.
+    assert len(mitigation.optimal_point) == 1
+    lo = max(cco.ranges_["p1"][0], es.ranges_["p1"][0])
+    hi = min(cco.ranges_["p1"][1], es.ranges_["p1"][1])
+    assert lo <= mitigation.optimal_point[0] <= hi
+
+
+def test_demo_optimizes_both_axes_when_they_overlap():
+    result = run_cmc_demo(
+        cco_file=SYNTHETIC / "xapp1_direct.csv",
+        es_file=SYNTHETIC / "xapp2_direct.csv",
+        resolution=32,
+        cmc_resolution=32,
+    )
+    mitigation = result["mitigation"]
+    cco, es = result["cco"], result["es"]
+    assert len(mitigation.optimal_point) == 2
+    for index, name in enumerate(("p1", "p2")):
+        lo = max(cco.ranges_[name][0], es.ranges_[name][0])
+        hi = min(cco.ranges_[name][1], es.ranges_[name][1])
+        assert lo <= mitigation.optimal_point[index] <= hi

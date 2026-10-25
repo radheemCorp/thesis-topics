@@ -84,7 +84,7 @@ def run_cmc_demo(
     resolution:
         Grid resolution for each xApp's decision search.
     cmc_resolution:
-        Number of discrete candidates the CMC sweeps over the shared ICP.
+        Number of discrete candidates per shared ICP axis.
 
     Returns
     -------
@@ -98,10 +98,18 @@ def run_cmc_demo(
     )
     conflict = detect_conflict(action_cco, action_es)
 
-    # Shared ICP p1 range = intersection of both xApps' observed p1 ranges.
-    lo = max(cco.ranges_["p1"][0], es.ranges_["p1"][0])
-    hi = min(cco.ranges_["p1"][1], es.ranges_["p1"][1])
-    cmc = CMC(range=(lo, hi), resolution=cmc_resolution)
+    # Joint range = per-axis intersection of both xApps' observed ranges.
+    # Axes that do not overlap (e.g. cmsORAN p2: 20 for CCO vs 60 for ES) are
+    # dropped from the sweep, leaving each xApp's preferred value fixed there.
+    axes: list[tuple[float, float]] = []
+    for name in CCO_CONFIG.spec.feature_names:
+        lo = max(cco.ranges_[name][0], es.ranges_[name][0])
+        hi = min(cco.ranges_[name][1], es.ranges_[name][1])
+        if lo <= hi:
+            axes.append((lo, hi))
+    if not axes:
+        raise ValueError("CCO and ES xApps share no overlapping ICP range")
+    cmc = CMC(ranges=axes, resolution=cmc_resolution)
     mitigation: MitigationResult = cmc.mitigate([cco, es])
 
     return {
