@@ -23,7 +23,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Update existing mocks to the extended protocol — 44d299d
   - [x] Update `_MockXApp` in `tests/test_cmc.py` to expose `preferred_point` and accept an optional `p2`.
   - [x] Confirm the pre-existing 20 CMC tests still pass.
-- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) [checkpoint: PENDING]
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) [checkpoint: 81ded6a]
 
 ### Phase 1 verification report (2026-10-25)
 
