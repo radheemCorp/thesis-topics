@@ -469,3 +469,70 @@ def test_predict_many_validates_arity_and_training(trained_cco: CCOxApp):
         trained_cco.predict_many(np.zeros((2, 3)))
     with pytest.raises(ValueError):
         trained_cco.predict_many(np.zeros((2, 2, 2)))
+
+
+# --- CMC optimize_over subset -------------------------------------------
+
+def test_optimize_over_p1_reproduces_scalar_result():
+    joint = CMC(
+        ranges=[(0.0, 5.0), (0.0, 0.0)],
+        resolution=[6, 2],
+        optimize_over=[0],
+    ).mitigate(_two_conflicting())
+    scalar = CMC(range=(0.0, 5.0), resolution=6).mitigate(_two_conflicting())
+    assert joint.optimal_point == pytest.approx((3.0, 0.0))
+    assert joint.optimal_value == pytest.approx(scalar.optimal_value)
+    assert joint.n_satisfied_before == scalar.n_satisfied_before
+    assert joint.n_satisfied_after == scalar.n_satisfied_after
+
+
+def _p2_conflict():
+    return [
+        _MockXApp("A", slope=0.0, intercept=0.0, objective="max",
+                  qos_threshold=3.0, priority_weight=0.6,
+                  preferred_value=0.0, p2_const=5.0, p2_slope=1.0),
+        _MockXApp("B", slope=0.0, intercept=0.0, objective="min",
+                  qos_threshold=2.0, priority_weight=0.4,
+                  preferred_value=0.0, p2_const=0.0, p2_slope=1.0),
+    ]
+
+
+def test_optimize_over_p2_mitigates_a_p2_conflict():
+    res = CMC(
+        ranges=[(0.0, 0.0), (0.0, 5.0)],
+        resolution=[2, 6],
+        optimize_over=[1],
+    ).mitigate(_p2_conflict())
+    assert res.optimal_point == pytest.approx((0.0, 3.0))
+    assert res.n_satisfied_before == 2
+    assert res.n_satisfied_after == 1
+
+
+def test_non_optimized_icps_use_each_xapps_preferred_value():
+    a = _MockXApp("A", slope=1.0, intercept=0.0, objective="max",
+                  qos_threshold=100.0, priority_weight=0.5,
+                  preferred_value=10.0, p2_const=5.0, p2_slope=1.0)
+    b = _MockXApp("B", slope=1.0, intercept=0.0, objective="max",
+                  qos_threshold=100.0, priority_weight=0.5,
+                  preferred_value=-10.0, p2_const=0.0, p2_slope=1.0)
+    res = CMC(
+        ranges=[(0.0, 0.0), (0.0, 5.0)],
+        resolution=[2, 6],
+        optimize_over=[1],
+    ).mitigate([a, b])
+    p2_star = res.optimal_point[1]
+    for xapp, record in zip([a, b], res.per_xapp):
+        expected = xapp.predict_at(xapp.preferred_point[0], p2_star)
+        assert record["predicted_at_optimum"] == pytest.approx(expected)
+
+
+def test_optimize_over_rejects_out_of_range_indices():
+    with pytest.raises(ValueError):
+        CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=4,
+            optimize_over=[2])
+    with pytest.raises(ValueError):
+        CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=4,
+            optimize_over=[])
+    with pytest.raises(ValueError):
+        CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=4,
+            optimize_over=[0, 0])
