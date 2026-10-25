@@ -41,9 +41,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Joint 2-D sweep with the unchanged QACM cost — 0d9bebb
   - [x] Write failing tests with analytic 2-D mocks (known minimum): optimum is found; both `max` and `min` objectives work; weights are normalized.
   - [x] Implement the sweep and return `optimal_point`.
-- [ ] Task: `optimize_over` subset support
-  - [ ] Write failing tests: `optimize_over=[0]` reproduces the 1-D result; `optimize_over=[1]` mitigates a `p2`-mediated conflict; non-optimized ICPs are held at each xApp's `preferred_point`.
-  - [ ] Implement subset selection and per-xApp fixed-coordinate queries.
+- [x] Task: `optimize_over` subset support — 5916113
+  - [x] Write failing tests: `optimize_over=[0]` reproduces the 1-D result; `optimize_over=[1]` mitigates a `p2`-mediated conflict; non-optimized ICPs are held at each xApp's `preferred_point`.
+  - [x] Implement subset selection and per-xApp fixed-coordinate queries.
 - [ ] Task: Dimension-aware `MitigationResult`
   - [ ] Write failing tests: `optimal_point` has the right arity; `optimal_value` returns index 0; `per_xapp` contains `preferred_point` and `predicted_at_preferred`; `satisfied_before` matches `predict_at(*preferred_point)`.
   - [ ] Implement the dataclass changes with backward-compatible properties.
