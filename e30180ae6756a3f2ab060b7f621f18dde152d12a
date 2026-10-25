@@ -1,0 +1,12 @@
+Task: Capture current 1-D behavior as regression fixtures
+
+Changes:
+- Added tests/test_cmc_baseline.py with two characterization tests.
+- Pinned the cmsORAN CCO/ES demo result (p*=-56.688963) and a synthetic
+  app1/app2 result (p*=-83.110368), including per-xApp KPIs and satisfaction.
+
+Why:
+- The joint 2-D refactor must not silently alter the legacy scalar path.
+- These fixtures act as the backward-compatibility contract for Phase 1-3.
+
+Files: tests/test_cmc_baseline.py
