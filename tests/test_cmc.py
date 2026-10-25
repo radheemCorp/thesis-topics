@@ -631,3 +631,43 @@ def test_exact_rejects_empty_and_bad_weights():
     negative = _QuadMock("N", (0.0, 0.0), -1.0, -1.0)
     with pytest.raises(ValueError):
         cmc.exact_mitigate([negative])
+
+
+# --- Deterministic tie-break and complexity guard ------------------------
+
+def test_equal_cost_plateau_picks_lexicographically_smallest_point():
+    # KPI depends only on p1; every p2 in [5, 7] ties at the optimal p1=2.
+    a = _MockXApp("A", slope=1.0, intercept=0.0, objective="max",
+                  qos_threshold=10.0, priority_weight=1.0,
+                  preferred_value=0.0, p2_const=6.0)
+    cmc = CMC(ranges=[(0.0, 2.0), (5.0, 7.0)], resolution=[3, 3])
+    assert cmc.mitigate([a]).optimal_point == pytest.approx((2.0, 5.0))
+    assert cmc.exact_mitigate([a]).optimal_point == pytest.approx((2.0, 5.0))
+
+
+def test_grid_cap_rejects_oversized_candidate_set(monkeypatch):
+    monkeypatch.setattr(CMC, "MAX_GRID_POINTS", 10)
+    with pytest.raises(ValueError, match="resolution"):
+        CMC(ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=4)
+    # 2 x 3 = 6 points fits under the temporary cap.
+    assert CMC(
+        ranges=[(0.0, 1.0), (0.0, 1.0)], resolution=[2, 3]
+    ).candidate_grid().shape == (6, 2)
+
+
+def test_cmc_is_deterministic_across_runs():
+    xapps = _quad_conflict("max")
+    cmc = CMC(ranges=[(0.0, 4.0), (-1.0, 1.0)], resolution=[5, 3])
+    first = cmc.mitigate(xapps).optimal_point
+    second = cmc.mitigate(xapps).optimal_point
+    assert first == second == cmc.exact_mitigate(xapps).optimal_point
+
+
+def test_cmc_rejects_non_finite_predictions():
+    class _NaNMock(_MockXApp):
+        def predict_at(self, p1, p2=None):
+            return float("nan")
+
+    nan_xapp = _NaNMock("NaN", 1.0, 0.0, "max", 0.5, 1.0)
+    with pytest.raises(ValueError, match="non-finite"):
+        CMC(ranges=[(0.0, 1.0)], resolution=3).mitigate([nan_xapp])

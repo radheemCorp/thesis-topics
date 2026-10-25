@@ -329,6 +329,10 @@ class CMC:
             n_satisfied += satisfied
 
         costs -= n_satisfied.astype(float) ** 2
+        if not np.all(np.isfinite(costs)):
+            raise ValueError(
+                "non-finite mitigation cost; check xApp predictions for NaN/inf"
+            )
         best_index = self._select_best(costs)
         grid_point = grid[best_index]
         optimal_point = self._assemble_point(grid_point, xapps, weights)
@@ -383,6 +387,10 @@ class CMC:
                 cost += weight * deviation * self.zeta
                 n_satisfied += int(satisfied)
             cost -= n_satisfied ** 2
+            if not math.isfinite(cost):
+                raise ValueError(
+                    "non-finite mitigation cost; check xApp predictions for NaN/inf"
+                )
 
             candidate = tuple(float(value) for value in point)
             if cost < best_cost - 1e-12 or (
@@ -461,9 +469,13 @@ class CMC:
 
     @staticmethod
     def _select_best(costs: np.ndarray) -> int:
-        """Return the first index of the minimum cost (lexicographic tie-break)."""
+        """Return the first index of the minimum cost (lexicographic tie-break).
+
+        The grid is laid out in lexicographic order, so the first of the
+        exactly-minimal entries is the lexicographically smallest optimal point.
+        """
         minimum = float(np.min(costs))
-        close = np.flatnonzero(np.isclose(costs, minimum, rtol=0.0, atol=1e-12))
+        close = np.flatnonzero(costs == minimum)
         return int(close[0])
 
     def _assemble_point(
