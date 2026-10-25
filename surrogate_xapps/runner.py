@@ -114,52 +114,86 @@ def run_cmc_demo(
     }
 
 
-def print_cmc_report(result: dict[str, Any]) -> None:
+def print_cmc_report(
+    result: dict[str, Any],
+    actions: Sequence[dict[str, Any]] | None = None,
+    axes: Sequence[int] | None = None,
+) -> None:
     """Print a before/after QoS comparison table for a CMC demo run.
 
     Parameters
     ----------
     result:
-        The dict returned by :func:`run_cmc_demo`.
+        The dict returned by :func:`run_cmc_demo` (or an equivalent dict with
+        ``"mitigation"`` and optionally ``"action_cco"``/``"action_es"``).
+    actions:
+        Full list of xApp action dicts. When omitted, the legacy
+        ``action_cco``/``action_es`` entries from ``result`` are used.
+    axes:
+        Coordinate indices to show in the ``p*`` line. ``None`` shows every
+        coordinate; the scenario CLI uses this to present a 1-D view.
     """
-    mit: MitigationResult = result["mitigation"]
-    action_cco = result["action_cco"]
-    action_es = result["action_es"]
+    mitigation: MitigationResult = result["mitigation"]
+    if actions is None:
+        actions = [
+            result[key]
+            for key in ("action_cco", "action_es")
+            if key in result
+        ]
+    action_list = list(actions)
 
+    point = mitigation.optimal_point
+    indices = list(range(len(point))) if axes is None else list(axes)
+    coords = ", ".join(f"p{index + 1}={point[index]:.2f}" for index in indices)
     print("QACM Conflict Mitigation — before/after QoS")
     print("=" * 60)
-    print(f"Optimal compromise p* (p1) = {mit.optimal_value:.2f}")
+    print(f"Optimal compromise p* = ({coords})")
     print()
+
     header = (
-        f"{'xApp':<10} {'req_p1':>9} {'kpi@req':>9} {'kpi@p*':>9} "
+        f"{'xApp':<12} {'requested':<24} {'kpi@req':>9} {'kpi@p*':>9} "
         f"{'thr':>7} {'sat_before':>11} {'sat_after':>10}"
     )
     print(header)
     print("-" * len(header))
-    req_by_id = {}
-    kpi_req_by_id = {}
-    for action in (action_cco, action_es):
-        req_by_id[action["xapp_id"]] = action["requested_value"][0]
-        kpi_req_by_id[action["xapp_id"]] = action["predicted_kpi"]
-    # Also include any other xApps present in mitigation records
-    for rec in mit.per_xapp:
-        xid = rec["xapp_id"]
-        if xid not in req_by_id:
-            req_by_id[xid] = float("nan")
-            kpi_req_by_id[xid] = float("nan")
-    for rec in mit.per_xapp:
-        xid = rec["xapp_id"]
-        print(
-            f"{xid:<10} {req_by_id[xid]:>9.2f} {kpi_req_by_id[xid]:>9.3f} "
-            f"{rec['predicted_at_optimum']:>9.3f} {rec['qos_threshold']:>7.2f} "
-            f"{str(rec['satisfied_before']):>11} {str(rec['satisfied_at_optimum']):>10}"
+
+    requested: dict[str, tuple[float, ...]] = {}
+    kpi_at_request: dict[str, float] = {}
+    for action in action_list:
+        xapp_id = action["xapp_id"]
+        requested[xapp_id] = tuple(float(v) for v in action["requested_value"])
+        kpi_at_request[xapp_id] = float(action["predicted_kpi"])
+    for record in mitigation.per_xapp:
+        xapp_id = record["xapp_id"]
+        requested.setdefault(
+            xapp_id, tuple(float(v) for v in record["preferred_point"])
         )
+        kpi_at_request.setdefault(
+            xapp_id, float(record["predicted_at_preferred"])
+        )
+
+    for record in mitigation.per_xapp:
+        xapp_id = record["xapp_id"]
+        request_text = "[" + ", ".join(
+            f"{value:.2f}" for value in requested[xapp_id]
+        ) + "]"
+        print(
+            f"{xapp_id:<12} {request_text:<24} "
+            f"{kpi_at_request[xapp_id]:>9.3f} "
+            f"{record['predicted_at_optimum']:>9.3f} "
+            f"{record['qos_threshold']:>7.2f} "
+            f"{str(record['satisfied_before']):>11} "
+            f"{str(record['satisfied_at_optimum']):>10}"
+        )
+
     print()
     print(
-        f"Satisfied before: {mit.n_satisfied_before}/{len(mit.per_xapp)}  ->  "
-        f"Satisfied after: {mit.n_satisfied_after}/{len(mit.per_xapp)}"
+        f"Satisfied before: {mitigation.n_satisfied_before}/"
+        f"{len(mitigation.per_xapp)}  ->  "
+        f"Satisfied after: {mitigation.n_satisfied_after}/"
+        f"{len(mitigation.per_xapp)}"
     )
-    print("IMPROVED" if mit.improved() else "NOT IMPROVED")
+    print("IMPROVED" if mitigation.improved() else "NOT IMPROVED")
 
 
 def _print_report(
