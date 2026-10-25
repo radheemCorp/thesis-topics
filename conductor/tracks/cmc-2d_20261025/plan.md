@@ -69,9 +69,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Dimension-aware report — 77634e7
   - [x] Write failing tests: `print_cmc_report(result, actions=...)` prints `p* = (p1, p2)` and each xApp's requested point; no `nan` values for 3rd/4th xApps.
   - [x] Refactor `print_cmc_report` to accept the full action list while keeping the legacy two-action call valid.
-- [ ] Task: CLI joint/1-D selection and per-axis resolution
-  - [ ] Write failing tests: `--optimize-over joint|p1|p2` changes the printed `p*` dimension; `--cmc-resolution` accepts one or two values.
-  - [ ] Implement the arguments in `cli/cli.py` and thread them to `CMC`.
+- [x] Task: CLI joint/1-D selection and per-axis resolution — 8a6e222
+  - [x] Write failing tests: `--optimize-over joint|p1|p2` changes the printed `p*` dimension; `--cmc-resolution` accepts one or two values.
+  - [x] Implement the arguments in `cli/cli.py` and thread them to `CMC`.
 - [ ] Task: `run_cmc_demo` uses joint range intersection
   - [ ] Write failing tests: the demo's `p*` lies within the intersection of both xApps' observed ranges on each axis.
   - [ ] Update `surrogate_xapps/runner.py`.
