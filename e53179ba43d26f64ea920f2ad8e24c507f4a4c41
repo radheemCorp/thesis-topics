@@ -1,0 +1,21 @@
+Phase 2 Verification Report (2026-10-25)
+
+Scope: 81ded6a..HEAD
+- surrogate_xapps/cmc.py (joint grid, cost, optimize_over, exact oracle,
+  tie-break, cap)
+- surrogate_xapps/xapps.py (predict_many batching)
+- tests/test_cmc.py (2-D analytic, subset, result, exact, tie-break)
+
+Automated:
+- uv run pytest -q -> 93 passed
+- coverage: 94% total (cmc.py 95%, xapps.py 90%)
+
+Manual:
+- analytic max/min -> p*=(2.0,0.0), exact matches
+- synthetic app1+app2 q=0.35: 1-D 1/2 satisfied; joint 2-D 2/2 satisfied
+- plateau -> lexicographically smallest point
+- grid cap + NaN guard -> actionable ValueError
+- 16,384-point 2-xApp sweep in ~0.05 s
+
+Test files: present for every changed code file.
+Deviations: none.
