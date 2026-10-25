@@ -1,0 +1,19 @@
+Phase 3 Verification Report (2026-10-25)
+
+Scope: e53179b..HEAD
+- surrogate_xapps/runner.py (dimension-aware report, range intersection)
+- cli/cli.py (optimize-over modes, per-axis resolution)
+- tests/test_runner_report.py, tests/test_cli_scenarios.py
+
+Automated:
+- uv run pytest -q -> 105 passed
+- coverage: 95% total (runner.py 99%, cmc.py 95%, xapps.py 90%)
+
+Manual:
+- joint: p*=(-98.39, 41.29), 2/2 satisfied
+- p1-only: p*=(-98.39), 1/2 satisfied (xApp1 0.324 < 0.35)
+- p2-only: p*=(p2=36.13)
+- 4 apps: no nan, 4/4 satisfied
+
+Test files: present for every changed code file.
+Deviations: none.
