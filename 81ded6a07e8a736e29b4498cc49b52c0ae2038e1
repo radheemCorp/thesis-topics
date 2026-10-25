@@ -1,0 +1,19 @@
+Phase 1 Verification Report (2026-10-25)
+
+Scope: 220108e..HEAD
+- surrogate_xapps/cmc.py (protocol)
+- surrogate_xapps/xapps.py (preferred_point, 2-D predict_at)
+- tests/test_cmc.py (protocol/mocks)
+- tests/test_cmc_baseline.py (regression fixtures)
+
+Automated:
+- uv run pytest -q -> 68 passed
+- coverage: 95% total (cmc.py 97%, xapps.py 89%)
+
+Manual:
+- predict_at(*preferred_point) == infer_action()['predicted_kpi'] for CCO and ES
+- untrained predict_at/preferred_point raise RuntimeError
+- synthetic app1/app2 scalar mitigation: 2/0 satisfied (documented gap)
+
+Test files: present for every changed code file.
+Deviations: none.
