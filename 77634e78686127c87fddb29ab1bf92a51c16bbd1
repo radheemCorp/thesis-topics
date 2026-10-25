@@ -1,0 +1,15 @@
+Task: Dimension-aware report
+
+Changes:
+- print_cmc_report(result, actions=None, axes=None) prints
+  'p* = (p1=..., p2=...)' and a full requested-point column.
+- Full action list is honoured; any xApp missing from actions falls back to its
+  mitigation record's preferred_point/predicted_at_preferred, so 3rd/4th xApps
+  never print nan.
+- Legacy two-action result dicts still work without passing actions.
+- axes lets callers show only the optimized coordinates (used by the CLI).
+
+Tests: 4-xApp scenario has no nan and shows all IDs; explicit axis selection
+hides p2; the legacy run_cmc_demo path still prints both xApps.
+
+Files: surrogate_xapps/runner.py, tests/test_runner_report.py
