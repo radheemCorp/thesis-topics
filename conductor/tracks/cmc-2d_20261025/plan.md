@@ -75,7 +75,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: `run_cmc_demo` uses joint range intersection — bd6baaf
   - [x] Write failing tests: the demo's `p*` lies within the intersection of both xApps' observed ranges on each axis.
   - [x] Update `surrogate_xapps/runner.py`.
-- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) [checkpoint: PENDING]
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) [checkpoint: dcc9cc9]
 
 ### Phase 3 verification report (2026-10-25)
 
