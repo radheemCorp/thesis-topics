@@ -1,0 +1,16 @@
+Task: CLI joint/1-D selection and per-axis resolution
+
+Changes:
+- --optimize-over {joint,p1,p2} (default joint). p1 optimizes p1 only (1-D
+  ranges, p2 held at each xApp's preferred); p2 optimizes p2 with p1 fixed;
+  joint optimizes both.
+- --cmc-resolution now takes nargs='+': one value broadcasts, two set p1/p2.
+- CMC ranges are per-axis intersections of all xApps' observed ranges; empty
+  intersections raise actionable SystemExit messages.
+- The report receives the full action list and an axes selection, so p1/p2
+  modes print a single coordinate and 3rd/4th xApps never show nan.
+
+Tests: parser defaults/overrides/choices; joint prints p1+p2; p1/p2 print one
+coordinate; 3-app run has no nan.
+
+Files: cli/cli.py, tests/test_cli_scenarios.py
