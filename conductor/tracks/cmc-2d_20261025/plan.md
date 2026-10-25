@@ -23,7 +23,15 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Update existing mocks to the extended protocol — 44d299d
   - [x] Update `_MockXApp` in `tests/test_cmc.py` to expose `preferred_point` and accept an optional `p2`.
   - [x] Confirm the pre-existing 20 CMC tests still pass.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) [checkpoint: PENDING]
+
+### Phase 1 verification report (2026-10-25)
+
+- **Scope:** `220108e..HEAD` — `surrogate_xapps/cmc.py`, `surrogate_xapps/xapps.py`, `tests/test_cmc.py`, `tests/test_cmc_baseline.py`.
+- **Tests:** `uv run pytest -q` → 68 passed.
+- **Coverage:** `uv run pytest --cov=surrogate_xapps` → 95% total (`cmc.py` 97%, `xapps.py` 89%).
+- **Manual checks:** `predict_at(*preferred_point) == infer_action()["predicted_kpi"]` for CCO and ES; untrained `predict_at`/`preferred_point` raise `RuntimeError`; the synthetic 2-app scalar run reports 2/0 satisfied (the gap Phase 2 closes).
+- **Deviations:** none.
 
 ## Phase 2 — Joint 2-D CMC Core & Exact Oracle
 

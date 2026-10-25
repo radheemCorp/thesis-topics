@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: CMC Joint 2-D Mitigation**
+- [~] **Track: CMC Joint 2-D Mitigation**
 *Link: [./cmc-2d_20261025/](./cmc-2d_20261025/)*
