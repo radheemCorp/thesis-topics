@@ -32,7 +32,8 @@ class _MockXApp:
 
     def __init__(self, xapp_id: str, slope: float, intercept: float, objective: str,
                  qos_threshold: float, priority_weight: float,
-                 preferred_value: float = 0.0, p2_const: float = 0.0):
+                 preferred_value: float = 0.0, p2_const: float = 0.0,
+                 p2_slope: float = 0.0):
         self.xapp_id = xapp_id
         self.slope = slope
         self.intercept = intercept
@@ -41,13 +42,15 @@ class _MockXApp:
         self.priority_weight = priority_weight
         self.preferred_value = preferred_value
         self.p2_const = p2_const
+        self.p2_slope = p2_slope
 
     @property
     def preferred_point(self) -> tuple[float, ...]:
         return (self.preferred_value, self.p2_const)
 
     def predict_at(self, p1: float, p2: float | None = None) -> float:
-        return self.slope * p1 + self.intercept
+        effective_p2 = self.p2_const if p2 is None else float(p2)
+        return self.slope * p1 + self.p2_slope * effective_p2 + self.intercept
 
 
 def test_protocol_is_runtime_checkable():
@@ -65,6 +68,16 @@ def test_protocol_predict_at_returns_float():
     xapp = _MockXApp("x", 1.0, 0.0, "max", 0.5, 0.5)
     result = xapp.predict_at(1.0)
     assert isinstance(result, float)
+
+
+def test_mock_predict_at_honours_p2_and_prefers_its_own():
+    xapp = _MockXApp(
+        "x", 1.0, 0.5, "max", 0.5, 0.5,
+        preferred_value=1.0, p2_const=2.0, p2_slope=3.0,
+    )
+    assert xapp.preferred_point == (1.0, 2.0)
+    assert xapp.predict_at(1.0) == pytest.approx(1.0 + 3.0 * 2.0 + 0.5)
+    assert xapp.predict_at(1.0, 4.0) == pytest.approx(1.0 + 3.0 * 4.0 + 0.5)
 
 
 def test_protocol_requires_preferred_point():
