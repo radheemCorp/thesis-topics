@@ -47,9 +47,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Dimension-aware `MitigationResult` — 31dfcef
   - [x] Write failing tests: `optimal_point` has the right arity; `optimal_value` returns index 0; `per_xapp` contains `preferred_point` and `predicted_at_preferred`; `satisfied_before` matches `predict_at(*preferred_point)`.
   - [x] Implement the dataclass changes with backward-compatible properties.
-- [ ] Task: `exact_mitigate` reference solver
-  - [ ] Write failing tests: heuristic cost equals exact cost on small 2–3 xApp analytic instances; exact solver rejects empty xApps and unnormalizable weights.
-  - [ ] Implement the brute-force oracle in `surrogate_xapps/cmc.py` (numpy only).
+- [x] Task: `exact_mitigate` reference solver — afc103b
+  - [x] Write failing tests: heuristic cost equals exact cost on small 2–3 xApp analytic instances; exact solver rejects empty xApps and unnormalizable weights.
+  - [x] Implement the brute-force oracle in `surrogate_xapps/cmc.py` (numpy only).
 - [ ] Task: Deterministic tie-break and complexity guard
   - [ ] Write failing tests: equal-cost plateaus resolve to the lexicographically smallest point; a grid above the configured cap raises/warns with an actionable message.
   - [ ] Implement the tie-break rule and cap check.
