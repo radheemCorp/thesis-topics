@@ -1,0 +1,17 @@
+Task: Add preferred_point and 2-D predict_at to BaseXApp
+
+Changes:
+- BaseXApp.predict_at(p1, p2=None) now evaluates the surrogate at an explicit
+  2-D point; p2 defaults to the xApp's preferred p2 (not the dataset min).
+- Supports k>2 features by fixing every ICP after the first at its preferred
+  coordinate; raises ValueError if p2 is passed to a 1-ICP xApp.
+- Replaced the old 'p2 held at observed constant' test with tests for the
+  preferred-p2 default, explicit-p2 override, and untrained guards.
+- Updated the synthetic baseline to the corrected interim 1-D result:
+  with only p1 free and p2 preferred, neither app is satisfied (p*=-100.5017).
+
+Why:
+- Pinning p2 at the dataset minimum never exercised the real 2-D surface and
+  made 'before' KPIs disagree with the xApp's own request.
+
+Files: surrogate_xapps/xapps.py, tests/test_cmc.py, tests/test_cmc_baseline.py
