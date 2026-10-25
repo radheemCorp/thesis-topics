@@ -53,7 +53,16 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 - [x] Task: Deterministic tie-break and complexity guard — 961fd10
   - [x] Write failing tests: equal-cost plateaus resolve to the lexicographically smallest point; a grid above the configured cap raises/warns with an actionable message.
   - [x] Implement the tie-break rule and cap check.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) [checkpoint: PENDING]
+
+### Phase 2 verification report (2026-10-25)
+
+- **Scope:** `81ded6a..HEAD` — `surrogate_xapps/cmc.py`, `surrogate_xapps/xapps.py`, `tests/test_cmc.py`.
+- **Tests:** `uv run pytest -q` → 93 passed.
+- **Coverage:** 94% total (`cmc.py` 95%, `xapps.py` 90%).
+- **Manual checks:** analytic 2-D max/min both give `p*=(2.0,0.0)` and `exact_mitigate` agrees; synthetic app1+app2 at `q=0.35` goes from `1/2` satisfied (1-D) to `2/2` satisfied (joint 2-D); equal-cost plateau picks the lexicographic smallest point; grid cap and NaN guard raise actionable `ValueError`s.
+- **Performance:** 2 xApps at 128×128 (16,384 points) in ~0.05 s via `predict_many` batching.
+- **Deviations:** none.
 
 ## Phase 3 — Runner, Report, and CLI
 
