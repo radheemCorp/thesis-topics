@@ -1,0 +1,15 @@
+Task: Deterministic tie-break and complexity guard
+
+Changes:
+- _select_best now uses exact cost equality (no tolerance) and returns the
+  first minimal index; because the grid is lexicographic, this is the
+  lexicographically smallest optimal point.
+- mitigate() raises ValueError if any cost is NaN/inf; exact_mitigate() does
+  the same per point, with an actionable message.
+- Grid size is validated in __init__ against MAX_GRID_POINTS (1,000,000).
+
+Tests: p2 plateau resolves to the smallest p2 for both solvers; a monkeypatched
+cap rejects oversized grids and accepts a fitting one; repeated runs are
+deterministic; NaN predictions are rejected.
+
+Files: surrogate_xapps/cmc.py, tests/test_cmc.py
