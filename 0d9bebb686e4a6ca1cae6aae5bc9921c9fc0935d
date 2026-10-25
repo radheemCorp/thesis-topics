@@ -1,0 +1,19 @@
+Task: Joint 2-D sweep with the unchanged QACM cost
+
+Changes:
+- mitigate() now sweeps the Cartesian candidate grid, vectorizes cost and
+  satisfaction counts, and returns optimal_point (arity = ranges arity).
+- MitigationResult.optimal_point is canonical; optimal_value is a deprecated
+  read-only view of optimal_point[0]. The constructor still accepts the
+  legacy optimal_value keyword.
+- Per-xApp records gain preferred_point and predicted_at_preferred.
+- Added BaseXApp.predict_many for batch surrogate inference; CMC uses it when
+  available (duck-typed) and falls back to scalar predict_at.
+- Fixed rows to carry every xApp ICP, so a 1-D CMC can drive a 2-D xApp with
+  p2 fixed at that xApp's preferred value.
+- Analytic 2-D quadratic mocks verify a hand-computed minimum (2,0) for both
+  max and min objectives, plus weight-scale invariance.
+
+Performance: 2 xApps at 128x128 = 16,384 points in ~0.05 s on this machine.
+
+Files: surrogate_xapps/cmc.py, surrogate_xapps/xapps.py, tests/test_cmc.py
