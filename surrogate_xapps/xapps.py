@@ -207,8 +207,8 @@ class BaseXApp:
             return predicted_kpi >= self.config.qos_threshold
         return predicted_kpi <= self.config.qos_threshold
 
-    def predict_at(self, p1: float) -> float:
-        """Predicted KPI if forced to use ``p1`` (p2 held at observed constant).
+    def predict_at(self, p1: float, p2: float | None = None) -> float:
+        """Predicted KPI if forced to use ``(p1, p2)``.
 
         Satisfies :class:`~surrogate_xapps.cmc.IQueryableXApp` so the CMC can
         query this xApp without touching its internals.
@@ -216,18 +216,34 @@ class BaseXApp:
         Parameters
         ----------
         p1:
-            The value of the shared Input Control Parameter.
+            The value of the first Input Control Parameter.
+        p2:
+            The value of the second Input Control Parameter. When ``None``, the
+            xApp's own preferred ``p2`` is used (not a dataset extreme), so the
+            result agrees with its uncoordinated :meth:`infer_action` request.
+            Any further ICPs are likewise fixed at their preferred values.
 
         Returns
         -------
         float
-            The surrogate-predicted KPI at ``p1`` with ``p2`` fixed.
+            The surrogate-predicted KPI at the requested point.
         """
         if self.ranges_ is None:
             raise RuntimeError("xApp must be trained before predict_at()")
         names = list(self.config.spec.feature_names)
-        p2_const = self.ranges_[names[1]][0]
-        row = np.array([[float(p1), float(p2_const)]])
+        if len(names) == 1:
+            if p2 is not None:
+                raise ValueError("p2 was provided but this xApp exposes one ICP")
+            row = np.array([[float(p1)]])
+        else:
+            preferred = self.preferred_point
+            coords = [float(p1)]
+            for index, _name in enumerate(names[1:], start=1):
+                if index == 1 and p2 is not None:
+                    coords.append(float(p2))
+                else:
+                    coords.append(float(preferred[index]))
+            row = np.array([coords])
         return float(self.predict_kpi(row)[0])
 
 

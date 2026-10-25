@@ -120,25 +120,37 @@ def test_base_xapp_satisfies_protocol(trained_cco: CCOxApp, trained_es: ESxApp):
     assert isinstance(trained_es, IQueryableXApp)
 
 
-def test_predict_at_matches_predict_kpi(trained_cco: CCOxApp):
-    p1 = -47.49
-    p2_const = trained_cco.ranges_["p2"][0]
-    row = np.array([[p1, p2_const]])
+def test_predict_at_defaults_to_preferred_p2(trained_cco: CCOxApp):
+    p1, p2 = trained_cco.preferred_point
+    row = np.array([[p1, p2]])
     expected = float(trained_cco.predict_kpi(row)[0])
-    got = trained_cco.predict_at(p1)
-    assert got == pytest.approx(expected)
+    assert trained_cco.predict_at(p1) == pytest.approx(expected)
 
 
-def test_predict_at_holds_p2_constant(trained_es: ESxApp):
-    # predict_at must hold p2 at the observed constant (min of range for ES=60).
-    p2_const = trained_es.ranges_["p2"][0]
-    assert p2_const == 60.0
-    row1 = np.array([[-100.0, p2_const]])
-    row2 = np.array([[-50.0, p2_const]])
-    k1 = float(trained_es.predict_kpi(row1)[0])
-    k2 = float(trained_es.predict_kpi(row2)[0])
-    assert trained_es.predict_at(-100.0) == pytest.approx(k1)
-    assert trained_es.predict_at(-50.0) == pytest.approx(k2)
+def test_predict_at_honours_explicit_p2(trained_cco: CCOxApp):
+    p1, p2 = -47.49, 60.0
+    row = np.array([[p1, p2]])
+    expected = float(trained_cco.predict_kpi(row)[0])
+    assert trained_cco.predict_at(p1, p2) == pytest.approx(expected)
+
+
+def test_preferred_point_matches_infer_action(trained_es: ESxApp):
+    action = trained_es.infer_action()
+    assert trained_es.preferred_point == pytest.approx(
+        tuple(action["requested_value"])
+    )
+    assert trained_es.predict_at(*trained_es.preferred_point) == pytest.approx(
+        float(action["predicted_kpi"]), abs=1e-9
+    )
+
+
+def test_predict_at_requires_training():
+    from surrogate_xapps.config import CCO_CONFIG
+
+    with pytest.raises(RuntimeError):
+        CCOxApp(CCO_CONFIG).predict_at(0.0)
+    with pytest.raises(RuntimeError):
+        _ = CCOxApp(CCO_CONFIG).preferred_point
 
 
 # --- MitigationResult dataclass -------------------------------------------

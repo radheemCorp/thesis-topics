@@ -14,10 +14,15 @@ cmsORAN CCO/ES demo (``run_cmc_demo`` defaults):
 
 Synthetic app1/app2 (``xapp1_direct.csv`` / ``xapp2_direct.csv``, q=0.4 each,
 CMC resolution 300):
-    optimal_value = -83.11036789297658
-    satisfied before/after = 1/1, improved = True
-    app1 predicted_at_optimum = 0.4005933440744408 (q=0.4)
-    app2 predicted_at_optimum = -0.029123506422288503 (q=0.4)
+    optimal_value = -100.50167224080268
+    satisfied before/after = 2/0, improved = False
+    app1 predicted_at_optimum = 0.30360654186539204 (q=0.4, unsatisfied)
+    app2 predicted_at_optimum = 0.39972216321487314 (q=0.4, unsatisfied)
+
+Note: the synthetic value differs from the pre-refactor -83.110368 because
+``predict_at(p1)`` now holds ``p2`` at each xApp's preferred value instead of
+the dataset minimum. With only ``p1`` free, neither xApp can be satisfied --
+this is precisely the gap that joint 2-D mitigation closes in Phase 2.
 """
 
 from __future__ import annotations
@@ -80,15 +85,15 @@ def test_baseline_synthetic_two_app_is_stable() -> None:
     hi = max(x.ranges_["p1"][1] for x in xapps)
     mit = CMC(range=(lo, hi), resolution=300).mitigate(xapps)
 
-    assert mit.optimal_value == pytest.approx(-83.11036789297658, abs=1e-6)
-    assert mit.n_satisfied_before == 1
-    assert mit.n_satisfied_after == 1
-    assert mit.improved() is True
+    assert mit.optimal_value == pytest.approx(-100.50167224080268, abs=1e-6)
+    assert mit.n_satisfied_before == 2
+    assert mit.n_satisfied_after == 0
+    assert mit.improved() is False
 
     by_id = {rec["xapp_id"]: rec for rec in mit.per_xapp}
     assert by_id["xApp1"]["predicted_at_optimum"] == pytest.approx(
-        0.4005933440744408, abs=1e-6
+        0.30360654186539204, abs=1e-6
     )
     assert by_id["xApp2"]["predicted_at_optimum"] == pytest.approx(
-        -0.029123506422288503, abs=1e-6
+        0.39972216321487314, abs=1e-6
     )
