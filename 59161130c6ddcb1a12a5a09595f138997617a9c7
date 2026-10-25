@@ -1,0 +1,11 @@
+Task: optimize_over subset support
+
+The sweep/assemble helpers added in 0d9bebb already implemented the subset
+semantics; this commit adds the missing regression coverage:
+
+- optimize_over=[0] on a 2-D range reproduces the scalar 1-D result.
+- optimize_over=[1] mitigates a p2-only conflict at p2*=3.
+- Non-optimized ICPs are queried at each xApp's own preferred coordinate.
+- Out-of-range, empty, and duplicate indices are rejected.
+
+Files: tests/test_cmc.py
