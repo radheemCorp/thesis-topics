@@ -84,3 +84,4 @@ bak/                   Exploratory notes and early research directions
 ```
 
 This README is the entry point. The detailed claims, equations, experiment plans, and implementation decisions belong in the linked documents rather than in this overview.
+
