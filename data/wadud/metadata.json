@@ -1,0 +1,27 @@
+{
+  "seed": 42,
+  "points": 301,
+  "shared_icp": "p1",
+  "range": [
+    -150.0,
+    150.0
+  ],
+  "fixed_icps": {
+    "p2": 20.0,
+    "p3": 60.0,
+    "p4": 60.0,
+    "p5": 60.0,
+    "p6": 0.0,
+    "p7": 60.0,
+    "p8": 0.0
+  },
+  "equations": [
+    "k1",
+    "k2",
+    "k3",
+    "k41/k42 averaged for xapp4",
+    "k5"
+  ],
+  "source": "data/QACM/README.md; Wadud et al. 2311.13389v1",
+  "projection": "scalar p1 evaluation at declared fixed ICP values"
+}

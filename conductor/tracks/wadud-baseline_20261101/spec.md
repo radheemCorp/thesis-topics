@@ -1,9 +1,9 @@
 # Specification: Wadud Game-Theoretic Baseline (AM / NSWF / EG)
 
 **Track ID:** `wadud-baseline_20261101`
-**Status:** Draft
+**Status:** Baseline implementation complete; faithful paper-data adapter pending review
 **Type:** Benchmark / Evaluation
-**Scope:** Implement the arithmetic-mean (AM), Nash Social Welfare (NSWF) and Eisenberg-Gale (EG) conflict-mitigation baselines from Wadud, Golpayegani & Afraz (`2311.13389v1`, 2023) against the existing `IQueryableXApp` protocol, and evaluate them head-to-head with the current QACM CMC on the paper's three conflict scenarios and on the synthetic scenarios.
+**Scope:** Implement the arithmetic-mean (AM), Nash Social Welfare (NSWF) and Eisenberg-Gale (EG) conflict-mitigation baselines from Wadud, Golpayegani & Afraz (`2311.13389v1`, 2023) against the existing `IQueryableXApp` protocol, and evaluate them head-to-head with the current QACM CMC on faithful paper-derived scenarios and synthetic scenarios.
 
 **Related:**
 - Baseline paper: `2311.13389v1` — http://arxiv.org/abs/2311.13389
@@ -67,7 +67,7 @@ flowchart LR
 | Direct / indirect / implicit conflict scenarios | **Reproduce** | §5 results table |
 | CMS architecture (Ch1/Ch2, SDL, RCP/PGD/PKR/… tables) | **Out of scope** | Deployment architecture, not needed to compare mitigation quality |
 | CDC conflict classification rules | **Out of scope** | Our scenarios declare their conflict type explicitly |
-| 8-ICP / 6-KPI experimental model | **Partially reproduce** | Only the shared ICP is swept; non-conflicting ICPs are held at the paper's fixed values |
+| 8-ICP / 6-KPI experimental model | **Planned faithful adapter** | Sweep only shared `p1`; hold every other ICP at the paper's declared fixed value. Full-dimensional generated data is preferred over silently dropping columns |
 | MNO weight assignment policy | **Out of scope** | Weights are scenario inputs, not learned |
 
 ---
@@ -95,7 +95,8 @@ flowchart LR
 
 ### FR-3: Data and scenario adapter
 - Add a scenario registry (e.g. `surrogate_xapps/scenarios.py` or `scenarios/wadud.py`) defining S1–S9 from §5 with: dataset paths, xApp names/objectives, shared ICP, fixed non-conflicting ICP values, weights, and expected published outcome where one exists.
-- Paper datasets are the CSVs in `data/QACM/` (`data1`–`data5`). Note their shapes: `data2` and `data5` have three input columns; `data4` has two outputs. If a faithful slice at the paper's fixed ICP values is not possible from these files, add `scripts/gen_wadud_datasets.py` (fixed `random_state=42`) that regenerates the Gaussian surfaces with the paper's documented ranges, following the existing `scripts/gen_synthetic_2d.py` pattern.
+- Paper datasets are the CSVs in `data/QACM/` (`data1`–`data5`). Note their shapes: `data2` and `data5` have three input columns; `data4` has four input columns and two outputs. The approved implementation path is to add `scripts/gen_wadud_datasets.py` (fixed `random_state=42`) that regenerates full-dimensional Gaussian surfaces with the paper's documented ranges, while reusing the existing `DatasetSpec`/`load_dataset` contract.
+- The scenario adapter must expose the shared `p1` as the only optimized axis and pass the paper's fixed values for every non-shared ICP during prediction. Setting an unused feature to zero is not an accepted substitute unless zero is the declared paper value.
 - Phase 1 must record the confirmed xApp → dataset/column mapping in `docs/usage/BASELINES.md`; no mapping may be assumed silently.
 
 ### FR-4: Result schema and reporting

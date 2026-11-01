@@ -83,3 +83,12 @@ The iter-3 plan (spec §FR-8) evaluates against five metrics:
 | Training data volume | $10^5$ episodes | ~8.3k rows | Orders of magnitude short |
 
 **Bottom line:** The current CU-CP exports cover the *channel-quality and congestion* dimension (SINR, active UEs, RSRP/RSRQ) but are missing the entire *resource-utilization and throughput* dimension (PRB, PDCP throughput, transport blocks, modulation) that the iter-3 plan depends on. Throughput ($R_{u,t}$) is now **more critical than in earlier iterations**: it is the basis of the native A2C reward ($\tau_e$), the leftover-bits KPI, and the QACM QoS-satisfaction objective. Closing the gap requires exporting DU/MAC-layer KPMs (PRB utilization, transport blocks, modulation ratios) and CU-UP KPMs (PDCP throughput) from ns-O-RAN, plus a longer simulation run to reach the target data volume.
+
+## Wadud baseline data path
+
+The game-theoretic baseline comparison does not use these CU-CP telemetry
+exports. `scripts/gen_wadud_datasets.py` creates deterministic scalar
+projections of the documented Gaussian KPI surfaces over shared `p1`, fixing
+the other ICPs at the values recorded in `data/wadud/metadata.json`. This
+preserves the paper's scalar comparison contract without treating a missing
+feature as an implicit zero.

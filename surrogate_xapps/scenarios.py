@@ -26,13 +26,13 @@ class ScenarioSpec:
     )
 
 
-_PAPER = "data/QACM/"
+_PAPER = "data/wadud/"
 SCENARIOS = {
-    "S1": ScenarioSpec("S1", "Direct, non-priority", (_PAPER + "data1.csv", _PAPER + "data3.csv"), ("xApp1", "xApp2"), "p1", (0.5, 0.5), (0.0, -18.0)),
-    "S2": ScenarioSpec("S2", "Direct, priority", (_PAPER + "data1.csv", _PAPER + "data3.csv"), ("xApp1", "xApp2"), "p1", (0.4, 0.6), (22.0,)),
-    "S3": ScenarioSpec("S3", "Indirect", (_PAPER + "data3.csv", _PAPER + "data5.csv"), ("xApp2", "xApp4"), "p1", (0.1, 0.9), (12.0, 66.0, 110.0)),
-    "S4": ScenarioSpec("S4", "Implicit", (_PAPER + "data1.csv", _PAPER + "data3.csv"), ("xApp1", "xApp3"), "p1", (0.9, 0.1), (-84.0, -62.0, -75.0)),
-    "S5": ScenarioSpec("S5", "Four-way scaling", tuple(_PAPER + f"data{i}.csv" for i in range(1, 5)), ("xApp1", "xApp2", "xApp3", "xApp4"), "p1", (0.1, 0.2, 0.3, 0.4)),
+    "S1": ScenarioSpec("S1", "Direct, non-priority", (_PAPER + "xapp1.csv", _PAPER + "xapp2.csv"), ("xApp1", "xApp2"), "p1", (0.5, 0.5), (0.0, -18.0)),
+    "S2": ScenarioSpec("S2", "Direct, priority", (_PAPER + "xapp1.csv", _PAPER + "xapp2.csv"), ("xApp1", "xApp2"), "p1", (0.4, 0.6), (22.0,)),
+    "S3": ScenarioSpec("S3", "Indirect", (_PAPER + "xapp2.csv", _PAPER + "xapp4.csv"), ("xApp2", "xApp4"), "p1", (0.1, 0.9), (12.0, 66.0, 110.0)),
+    "S4": ScenarioSpec("S4", "Implicit", (_PAPER + "xapp1.csv", _PAPER + "xapp3.csv"), ("xApp1", "xApp3"), "p1", (0.9, 0.1), (-84.0, -62.0, -75.0)),
+    "S5": ScenarioSpec("S5", "Four-way scaling", tuple(_PAPER + f"xapp{i}.csv" for i in range(1, 5)), ("xApp1", "xApp2", "xApp3", "xApp4"), "p1", (0.1, 0.2, 0.3, 0.4)),
     "S6": ScenarioSpec("S6", "Synthetic direct pair", ("data/synthetic/xapp1_direct.csv", "data/synthetic/xapp2_direct.csv"), ("xApp1", "xApp2"), "p1", (0.5, 0.5)),
     "S7": ScenarioSpec("S7", "Synthetic indirect trio", tuple(f"data/synthetic/xapp{i}_{'direct' if i < 3 else 'indirect'}.csv" for i in range(1, 4)), ("xApp1", "xApp2", "xApp3"), "p1", (0.4, 0.4, 0.2)),
     "S8": ScenarioSpec("S8", "Weight sweep", (_PAPER + "data1.csv", _PAPER + "data3.csv"), ("xApp1", "xApp2"), "p1", (0.5, 0.5)),

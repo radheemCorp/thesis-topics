@@ -12,7 +12,7 @@ import numpy as np
 from .baselines import ArithmeticMeanPolicy, EisenbergGalePolicy, NSWFPolicy
 from .cmc import CMC
 from .scenarios import SCENARIOS, get_scenario
-from .config import CMSORAN_SPEC, XAppConfig
+from .config import CMSORAN_SPEC, DatasetSpec, XAppConfig
 from .data_loader import load_dataset
 from .xapps import CCOxApp
 from .utility import normalize_utility
@@ -108,11 +108,16 @@ def main(argv=None) -> int:
         raise SystemExit("scenario datasets are unavailable in the current repository")
     xapps = []
     for name, path, weight in zip(scenario.xapps, paths, scenario.weights):
+        spec = (
+            DatasetSpec(feature_cols=("Input1",), target_col="Output", feature_names=("p1",))
+            if "data/wadud/" in path.as_posix()
+            else CMSORAN_SPEC
+        )
         config = XAppConfig(
-            xapp_id=name, spec=CMSORAN_SPEC, objective="max",
+            xapp_id=name, spec=spec, objective="max",
             priority_weight=weight, model_kind="poly", resolution=32,
         )
-        X, y, _ = load_dataset(path, CMSORAN_SPEC)
+        X, y, _ = load_dataset(path, spec)
         xapps.append(CCOxApp(config).train(X, y))
     lo = max(x.ranges_["p1"][0] for x in xapps)
     hi = min(x.ranges_["p1"][1] for x in xapps)

@@ -1,7 +1,7 @@
 # Implementation Plan: Wadud Game-Theoretic Baseline (AM / NSWF / EG)
 
 **Track ID:** `wadud-baseline_20261101`
-**Status:** Implemented (runnable two-feature baseline; paper multi-ICP fixtures documented)
+**Status:** Provisional scalar data path implemented; paper mapping validation pending
 **Companion doc:** [spec.md](./spec.md)
 **Method:** Conductor TDD lifecycle — Write Tests (Red) → Implement (Green) → Refactor → Coverage → Commit + Git Note → Record SHA. See `workflow.md`.
 
@@ -13,10 +13,11 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 Goal: know exactly what data each paper scenario runs on, and have a tested KPI→utility conversion before any baseline is written. No baseline may land on undocumented data.
 
-- [ ] Task: Data provenance audit for `2311.13389v1`
+- [x] Task: Data provenance audit for `2311.13389v1`
   - [ ] Write `tests/test_wadud_data.py` asserting, for every scenario in spec §5, that the dataset exists, the shared ICP column spans the declared range, and the fixed non-conflicting ICP values are present (or sliceable).
   - [ ] Map `data/QACM/data1..data5.csv` to xApp1–xApp5, recording input/output columns and the `data4` two-output case; document the result in `docs/usage/BASELINES.md`.
-  - [ ] Decide reuse vs regenerate; if regenerating, add `scripts/gen_wadud_datasets.py` (seed=42, Gaussian formulas from `data/QACM/README.md`, `p1 ∈ [-150, 150]`) with a determinism test.
+  - [x] Decide reuse vs regenerate; add `scripts/gen_wadud_datasets.py` (seed=42, Gaussian formulas from `data/QACM/README.md`, `p1 ∈ [-150, 150]`) with a determinism test.
+  - [ ] Validate the provisional xApp/KPI mapping and fixed-ICP assignments against the paper; record published-value discrepancies without weakening assertions.
 - [x] Task: Utility normalisation module
   - [x] Write hand-computed tests for min–max ×10, including the `min`-objective inversion and the constant-KPI guard.
   - [x] Implement `surrogate_xapps/utility.py` with `mode ∈ {minmax10, zscore}`, returning the bounds used.
@@ -106,3 +107,28 @@ Goal: the comparison is reproducible from committed artifacts and every deviatio
   S1-S5 remain metadata fixtures because the current loader cannot represent the
   paper's 3–8 ICP and multi-output datasets without a separately regenerated
   adapter; S6-S7 are runnable end-to-end.
+
+## Proposed next phase — Faithful paper comparison (awaiting review)
+
+The current baseline policies and scalar optimizer are complete. The remaining
+gap is the paper-data adapter, not the mitigation objective. Before coding,
+review and approve this approach:
+
+1. Add `scripts/gen_wadud_datasets.py` with fixed seed `42`, the documented
+   Gaussian surfaces, full ICP columns, output metadata, and deterministic
+   regeneration tests.
+2. Reuse `DatasetSpec`/`load_dataset`; extend the existing data contract only
+   for explicit multi-feature selection and separate target columns. Do not
+   create a parallel loader.
+3. Add a Wadud scenario adapter that trains full-dimensional surrogates while
+   sweeping only shared `p1` and fixing every other ICP at the paper's declared
+   value. Never substitute `p2=0` unless the paper specifies zero.
+4. Keep S1-S5 paper-faithful and scalar (`optimize_over=[0]`); retain S6-S7 as
+   out-of-sample two-feature scenarios.
+5. Add reference-value/discrepancy tests, full S1-S9 evaluation output,
+   latency measurements, and the QACM-vs-baseline acceptance test only after
+   the data mapping is verified.
+
+The generator is now present as a provisional implementation. Its first S1
+run gives AM approximately `-34` versus the published `0`, so the mapping
+validation task remains open and must not be presented as a reproduced result.
