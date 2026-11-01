@@ -1,0 +1,32 @@
+Phase 5 Verification Report — Documentation & Finalization
+
+Automated tests
+---------------
+Command: uv run pytest -o addopts="" -q
+Result: 118 passed in 48.46s.
+
+Coverage
+--------
+Command: uv run pytest --cov=surrogate_xapps --cov=cli --cov-report=term-missing
+Result: 94% total (cli/cli.py 92%, cmc.py 95%, xapps.py 90%, runner.py 99%).
+
+Scope
+-----
+Previous checkpoint: 9370ef0
+Changed files: README.md, docs/usage/RUNNING_CMC.md, docs/usage/CLI.md,
+docs/usage/SCENARIOS.md (documentation only).
+
+Manual verification
+-------------------
+1. RUNNING_CMC.md contains the 'Paper vs extension' section (scalar QACM vs
+   joint 2-D FR-4.6 extension, with the deviation list).
+2. RUNNING_CMC.md contains the Performance table for N in {64,128,256} and
+   2/3/4 xApps; default 128/4 = ~7.6 ms, within the 1 s budget.
+3. 2-app joint CLI: p* = (p1=-91.94, p2=46.45).
+4. 3-app joint CLI (q=0.4,0.4,0.8): p* = (p1=-79.03, p2=43.87); p2 moves
+   from 46.45 toward app3's 40 peak, matching SCENARIOS.md.
+5. cmsORAN scalar demo: p* = (p1=-56.69), 2/2 -> 2/2 IMPROVED.
+
+User confirmation: Yes - checkpoint and finish.
+
+Deviations: none.
