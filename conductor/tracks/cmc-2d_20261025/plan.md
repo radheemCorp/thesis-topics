@@ -1,7 +1,7 @@
 # Implementation Plan: CMC Joint 2-D Mitigation
 
 **Track ID:** `cmc-2d_20261025`
-**Status:** Draft
+**Status:** Complete
 **Companion doc:** [spec.md](./spec.md)
 **Method:** Conductor TDD lifecycle — Write Tests (Red) → Implement (Green) → Refactor → Coverage → Commit + Git Note → Record SHA. See `workflow.md`.
 
@@ -122,7 +122,16 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Measure mitigation latency for `N ∈ {64,128,256}` × `|X'| ∈ {2,3,4}`; record the table in the run guide; confirm the default stays within the 1 s budget.
 - [x] Task: Final regression and coverage check — 118 passed, 94% total
   - [x] `uv run pytest` green; existing 61 tests unchanged; coverage >80% on touched modules.
-- [ ] Task: Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md) [checkpoint: e25a763]
+
+### Phase 5 verification report (2026-11-01)
+
+- **Scope:** `9370ef0..HEAD` — `README.md`, `docs/usage/RUNNING_CMC.md`, `docs/usage/CLI.md`, `docs/usage/SCENARIOS.md` (documentation only).
+- **Tests:** `uv run pytest -o addopts="" -q` → 118 passed.
+- **Coverage:** 94% total (`cli/cli.py` 92%, `cmc.py` 95%, `xapps.py` 90%, `runner.py` 99%).
+- **Benchmark:** `N ∈ {64,128,256}` × 2/3/4 xApps → 1.6–61.0 ms; default `N=128` with 4 xApps is ~7.6 ms, well inside the 1 s budget.
+- **Docs:** 2-D examples verified against real CLI output; scalar cmsORAN path unchanged (`p*=(p1=-56.69)`, 2/2); joint 3-app `p2*` shifts 46.45 → 43.87 toward app3's peak; paper-vs-extension note present in both `RUNNING_CMC.md` and `README.md`.
+- **Deviations:** none.
 
 ---
 
