@@ -33,7 +33,7 @@ uv run python cli/cli.py \
 uv run python cli/cli.py \
   --datasets data/synthetic/xapp1_direct.csv data/synthetic/xapp2_direct.csv data/synthetic/xapp3_indirect.csv \
   --xapps app1,app2,app3 \
-  --qos 0.4 0.4 0.4 --weights 0.33 0.33 0.34
+  --qos 0.4 0.4 0.8 --weights 1 1 1
 
 # Direct + Indirect + Extra (4-app)
 uv run python cli/cli.py \
@@ -51,6 +51,30 @@ Key observations from the synthetic cases:
 3. **Trade-off behavior**: As QoS thresholds tighten, satisfying all becomes harder; CMC’s objective (`Σ w_i·d_i·ζ − (Σ s_i)^2`) balances deviation vs maximizing satisfied count. The `IMPROVED`/`NOT IMPROVED` line reflects whether total satisfied count didn’t worsen.
 4. **Weights matter**: Increasing app3’s weight pulls the compromise toward its preferred region (demonstrates priority effects).
 5. **N-app modularity**: The CLI works with arbitrary counts (3,4+). The CMC itself accepts any `Sequence[IQueryableXApp]` with no code changes.
+
+## Automated coverage
+
+The Phase 4 scenario suite turns the observations above into regression tests:
+
+| Test | What it pins |
+|---|---|
+| `tests/test_synthetic.py::test_dataset_matches_metadata` | Ranges, peak coordinates, and amplitudes of all four CSVs |
+| `...::test_direct_conflict_compromise_lies_between_requests` | `p*` inside the app1/app2 request bounding box; both xApps recorded |
+| `...::test_indirect_conflict_shifts_p2_towards_app3` | Adding app3 changes `p2*` and moves it toward app3’s peak |
+| `...::test_priority_weight_pulls_p2_towards_app3` | Higher app3 weight moves `p2*` monotonically toward its preference |
+| `...::test_tightening_thresholds_never_increases_satisfied_count` | Threshold sweeps never raise `n_satisfied_after`; `improved()` stays consistent |
+| `tests/test_cli.py` (2-, 3-, 4-app) | Exit 0, `(p1, p2)` optimum printed, every xApp listed, no `nan` |
+
+Run them with:
+
+```bash
+uv run pytest tests/test_synthetic.py -q   # 10 tests
+uv run pytest tests/test_cli.py -q         # 3 tests
+```
+
+At the documented `--cmc-resolution 16 --resolution 16`, the app1/app2 run
+gives `p2* = 48.00`; adding app3 (`q=0.8`, equal weights) gives
+`p2* = 42.67`, visibly closer to app3’s `p2 = 40` peak.
 
 ## Reproducibility
 
