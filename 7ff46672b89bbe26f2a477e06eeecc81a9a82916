@@ -1,0 +1,16 @@
+Task: Indirect conflict test (Phase 4, cmc-2d_20261025)
+
+Added a scenario test comparing the app1/app2 joint optimum with and without
+app3. app3 is trained with a 0.8 QoS threshold so its deviation term is
+active at the direct-pair compromise.
+
+- p2* changes when app3 joins the mitigation set.
+- p2* moves closer to app3's documented p2 peak (40) than the pair-only
+  optimum.
+- All three xApps are recorded in per_xapp order.
+
+Files:
+- tests/test_synthetic.py
+
+Why: this is the acceptance test for indirect coupling (FR-7); it proves a
+non-requesting xApp can shift the compromise when its KPI surface overlaps.
