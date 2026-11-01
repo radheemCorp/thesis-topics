@@ -120,8 +120,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Add a short note to `docs/usage/RUNNING_CMC.md` and `README.md`: the QACM paper is scalar; joint 2-D follows iter-3 FR-4.6 and is an explicit extension.
 - [x] Task: Performance benchmark — b61d000
   - [x] Measure mitigation latency for `N ∈ {64,128,256}` × `|X'| ∈ {2,3,4}`; record the table in the run guide; confirm the default stays within the 1 s budget.
-- [ ] Task: Final regression and coverage check
-  - [ ] `uv run pytest` green; existing 61 tests unchanged; coverage >80% on touched modules.
+- [x] Task: Final regression and coverage check — 118 passed, 94% total
+  - [x] `uv run pytest` green; existing 61 tests unchanged; coverage >80% on touched modules.
 - [ ] Task: Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md)
 
 ---
