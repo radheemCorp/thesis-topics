@@ -1,0 +1,11 @@
+Task: Priority-weight test (Phase 4, cmc-2d_20261025)
+
+Added a scenario test that raises app3's priority weight from 0.25 to 1.0
+while keeping app1/app2 fixed, then asserts the joint p2* moves
+monotonically toward app3's own preferred p2 (and strictly closer overall).
+
+Files:
+- tests/test_synthetic.py
+
+Why: priority is the CS-facing knob that must visibly steer the compromise
+(FR-7). This pins that behaviour against the synthetic indirect conflict.
