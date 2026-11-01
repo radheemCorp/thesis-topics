@@ -96,8 +96,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Write a test asserting `p2*` for `[app1, app2, app3]` differs from `[app1, app2]` and moves toward app3's peak.
 - [x] Task: Priority-weight test — 0f88c9b
   - [x] Write a test: raising app3's weight moves `p2*` monotonically toward app3's preferred `p2`.
-- [ ] Task: Threshold sweep test
-  - [ ] Write a test: tightening QoS thresholds never increases `n_satisfied_after`; `improved()` reflects the before/after counts.
+- [x] Task: Threshold sweep test — f26ef6b
+  - [x] Write a test: tightening QoS thresholds never increases `n_satisfied_after`; `improved()` reflects the before/after counts.
 - [ ] Task: CLI integration tests
   - [ ] Write `tests/test_cli.py`: 2-, 3-, and 4-app invocations exit 0, print no `nan`, and print a `(p1, p2)` optimum.
 - [ ] Task: Coverage gate
