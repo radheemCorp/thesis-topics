@@ -1,0 +1,20 @@
+Task: Update usage docs (Phase 5, cmc-2d_20261025)
+
+Bring the usage guides in line with the joint 2-D implementation:
+
+- RUNNING_CMC.md: explains joint vs scalar mode, adds verified 2-D CLI
+  examples for the 2- and 3-app synthetic scenarios, documents
+  --optimize-over and per-axis --cmc-resolution, and shows programmatic
+  joint / subset / exact_oracle usage.
+- CLI.md: adds --optimize-over and per-axis --cmc-resolution, refreshes the
+  example output, and removes the stale 'nan for N>2' caveat.
+- SCENARIOS.md: adds an automated-coverage table mapping each Phase 4 test
+  to its assertion and records the p2* 48.00 -> 42.67 indirect shift.
+
+Files:
+- docs/usage/RUNNING_CMC.md
+- docs/usage/CLI.md
+- docs/usage/SCENARIOS.md
+
+Why: docs must match cli/cli.py and runner.py in the same change (docs/
+AGENTS.md), and FR-8 requires runnable 2-D examples.
