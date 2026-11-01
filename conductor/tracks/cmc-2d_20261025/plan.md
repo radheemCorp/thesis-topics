@@ -92,8 +92,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Write `tests/test_synthetic.py`: load all four CSVs, assert ranges, known peak coordinates, and that the maxima match the metadata.
 - [x] Task: Direct 2-D conflict test — 42e174e
   - [x] Write a test training app1/app2 and assert `p*` lies within the bounding box of their requested points and that both xApps are recorded.
-- [ ] Task: Indirect conflict test
-  - [ ] Write a test asserting `p2*` for `[app1, app2, app3]` differs from `[app1, app2]` and moves toward app3's peak.
+- [x] Task: Indirect conflict test — 7ff4667
+  - [x] Write a test asserting `p2*` for `[app1, app2, app3]` differs from `[app1, app2]` and moves toward app3's peak.
 - [ ] Task: Priority-weight test
   - [ ] Write a test: raising app3's weight moves `p2*` monotonically toward app3's preferred `p2`.
 - [ ] Task: Threshold sweep test
