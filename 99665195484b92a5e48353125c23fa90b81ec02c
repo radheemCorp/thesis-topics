@@ -1,0 +1,16 @@
+Task: Dataset contract tests (Phase 4, cmc-2d_20261025)
+
+Added tests/test_synthetic.py to pin the on-disk contract of the four
+synthetic 2-D conflict datasets.
+
+- Verifies synthetic_meta.json layout, peak set, and max objectives.
+- Loads each CSV through load_dataset(CMSORAN_SPEC) and asserts feature
+  ranges match metadata, all values are finite, and the argmax row sits
+  exactly on the documented (p1c, p2c) peak with amplitude A.
+- Guards the fixtures that later direct/indirect CMC scenario tests use.
+
+Files:
+- tests/test_synthetic.py (new)
+
+Why: Phase 4 scenario tests must fail for behavioural reasons, not because
+the synthetic fixtures drifted.
