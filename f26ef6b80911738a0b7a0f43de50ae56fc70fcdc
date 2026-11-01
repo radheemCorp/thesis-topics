@@ -1,0 +1,14 @@
+Task: Threshold sweep test (Phase 4, cmc-2d_20261025)
+
+Sweeps a shared QoS threshold from 0.2 to 0.9 over the app1/app2 direct
+conflict and asserts:
+
+- n_satisfied_after is monotonically non-increasing as thresholds tighten.
+- The loosest threshold satisfies more xApps than the strictest.
+- MitigationResult.improved() is exactly (after >= before) at every point.
+
+Files:
+- tests/test_synthetic.py
+
+Why: pins the QoS trade-off reported to the user and the contract of the
+improved() flag used by print_cmc_report.
