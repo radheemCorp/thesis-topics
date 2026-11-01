@@ -88,8 +88,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 4 — Synthetic Scenarios & Test Coverage
 
-- [ ] Task: Dataset contract tests
-  - [ ] Write `tests/test_synthetic.py`: load all four CSVs, assert ranges, known peak coordinates, and that the maxima match the metadata.
+- [x] Task: Dataset contract tests — 9966519
+  - [x] Write `tests/test_synthetic.py`: load all four CSVs, assert ranges, known peak coordinates, and that the maxima match the metadata.
 - [ ] Task: Direct 2-D conflict test
   - [ ] Write a test training app1/app2 and assert `p*` lies within the bounding box of their requested points and that both xApps are recorded.
 - [ ] Task: Indirect conflict test
