@@ -1,0 +1,16 @@
+Task: Direct 2-D conflict test (Phase 4, cmc-2d_20261025)
+
+Added a session-scoped synthetic_xapp fixture factory that trains and caches
+max-objective xApps on the four synthetic CSVs, then used it to cover the
+direct 2-D conflict between app1 and app2.
+
+- p* must lie inside the per-axis bounding box of the two requested points.
+- Both xApps appear in per_xapp in request order.
+- Both stay QoS-satisfied at the compromise (2/2 before and after).
+
+Files:
+- tests/conftest.py (synthetic fixtures, cached training)
+- tests/test_synthetic.py (direct conflict test)
+
+Why: the direct conflict is the basic acceptance case for joint 2-D
+bargaining; it must be pinned before the indirect/weight cases build on it.
