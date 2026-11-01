@@ -1,0 +1,15 @@
+Task: Performance benchmark (Phase 5, cmc-2d_20261025)
+
+Measured CMC.mitigate latency over the 2-D synthetic search box for
+N in {64,128,256} points per axis and 2/3/4 xApps (median of 3 runs after
+warm-up, ANN surrogates, random_state=42, xApp grid 24, training excluded).
+
+Results (ms): N=64 -> 1.6/2.3/3.0; N=128 -> 4.4/5.9/7.6;
+N=256 -> 25.3/40.2/61.0. Default N=128 with 4 xApps is ~7.6 ms, well within
+the 1 s scheduling budget.
+
+Files:
+- docs/usage/RUNNING_CMC.md
+
+Why: NFR-4 requires demonstrating the default 2-D sweep fits the Near-RT-RIC
+budget; the table also justifies the existing MAX_GRID_POINTS guard.
