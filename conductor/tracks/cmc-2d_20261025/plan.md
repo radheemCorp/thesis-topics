@@ -100,8 +100,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Write a test: tightening QoS thresholds never increases `n_satisfied_after`; `improved()` reflects the before/after counts.
 - [x] Task: CLI integration tests — 13ea5e1
   - [x] Write `tests/test_cli.py`: 2-, 3-, and 4-app invocations exit 0, print no `nan`, and print a `(p1, p2)` optimum.
-- [ ] Task: Coverage gate
-  - [ ] Run `uv run pytest --cov=surrogate_xapps --cov-report=term-missing`; ensure >80% on `cmc.py`, `xapps.py`, `runner.py`, and `cli/cli.py`.
+- [x] Task: Coverage gate — 94% total (cli 92%, cmc 95%, xapps 90%, runner 99%)
+  - [x] Run `uv run pytest --cov=surrogate_xapps --cov-report=term-missing`; ensure >80% on `cmc.py`, `xapps.py`, `runner.py`, and `cli/cli.py`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
 
 ## Phase 5 — Documentation & Finalization
