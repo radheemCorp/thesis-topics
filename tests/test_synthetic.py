@@ -134,3 +134,29 @@ def test_indirect_conflict_shifts_p2_towards_app3(synthetic_xapp, meta):
 
     assert p2_three != pytest.approx(p2_two, abs=1e-9)
     assert abs(p2_three - peak_p2) < abs(p2_two - peak_p2)
+
+
+def test_priority_weight_pulls_p2_towards_app3(synthetic_xapp):
+    """A larger app3 priority weight moves p2* toward app3's preference."""
+    pair = [
+        synthetic_xapp("xapp1_direct", qos=0.4),
+        synthetic_xapp("xapp2_direct", qos=0.4),
+    ]
+    cmc = CMC(ranges=RANGES, resolution=16)
+
+    p2_optima = []
+    app3 = None
+    for weight in (0.25, 0.5, 1.0):
+        app3 = synthetic_xapp("xapp3_indirect", qos=0.8, weight=weight)
+        result = cmc.mitigate([*pair, app3])
+        p2_optima.append(result.optimal_point[1])
+
+    assert app3 is not None
+    target_p2 = app3.preferred_point[1]
+    distances = [abs(p2 - target_p2) for p2 in p2_optima]
+
+    assert all(
+        later <= earlier + 1e-9
+        for earlier, later in zip(distances, distances[1:])
+    )
+    assert distances[-1] < distances[0]
