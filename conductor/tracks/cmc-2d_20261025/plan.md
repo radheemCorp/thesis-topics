@@ -94,8 +94,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Write a test training app1/app2 and assert `p*` lies within the bounding box of their requested points and that both xApps are recorded.
 - [x] Task: Indirect conflict test — 7ff4667
   - [x] Write a test asserting `p2*` for `[app1, app2, app3]` differs from `[app1, app2]` and moves toward app3's peak.
-- [ ] Task: Priority-weight test
-  - [ ] Write a test: raising app3's weight moves `p2*` monotonically toward app3's preferred `p2`.
+- [x] Task: Priority-weight test — 0f88c9b
+  - [x] Write a test: raising app3's weight moves `p2*` monotonically toward app3's preferred `p2`.
 - [ ] Task: Threshold sweep test
   - [ ] Write a test: tightening QoS thresholds never increases `n_satisfied_after`; `improved()` reflects the before/after counts.
 - [ ] Task: CLI integration tests
