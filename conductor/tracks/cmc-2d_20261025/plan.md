@@ -116,8 +116,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 - [x] Task: Update usage docs — 59d6e49
   - [x] Update `docs/usage/RUNNING_CMC.md` (2-D example), `docs/usage/CLI.md` (`--optimize-over`), and `docs/usage/SCENARIOS.md` (now covered by tests).
-- [ ] Task: Document the paper-vs-extension distinction
-  - [ ] Add a short note to `docs/usage/RUNNING_CMC.md` and `README.md`: the QACM paper is scalar; joint 2-D follows iter-3 FR-4.6 and is an explicit extension.
+- [x] Task: Document the paper-vs-extension distinction — 62a65c8
+  - [x] Add a short note to `docs/usage/RUNNING_CMC.md` and `README.md`: the QACM paper is scalar; joint 2-D follows iter-3 FR-4.6 and is an explicit extension.
 - [ ] Task: Performance benchmark
   - [ ] Measure mitigation latency for `N ∈ {64,128,256}` × `|X'| ∈ {2,3,4}`; record the table in the run guide; confirm the default stays within the 1 s budget.
 - [ ] Task: Final regression and coverage check
