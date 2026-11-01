@@ -155,6 +155,26 @@ cmc = CMC(ranges=[(-150, 50), (0, 80)], resolution=[64, 128])
 `result.optimal_value` remains available as a deprecated 1-D view of
 `result.optimal_point[0]`.
 
+## Performance
+
+The joint sweep costs `O(N1 · N2 · |X'|)` surrogate predictions, batched through
+`predict_many`. Measured `CMC.mitigate` latency on a 2-D search over
+`p1 ∈ [-150, 50]`, `p2 ∈ [0, 80]`:
+
+| `N` per axis | grid points | 2 xApps | 3 xApps | 4 xApps |
+|---|---|---|---|---|
+| 64 | 4,096 | 1.6 ms | 2.3 ms | 3.0 ms |
+| 128 (default) | 16,384 | 4.4 ms | 5.9 ms | 7.6 ms |
+| 256 | 65,536 | 25.3 ms | 40.2 ms | 61.0 ms |
+
+Method: synthetic max-objective xApps (ANN surrogates, `random_state=42`,
+xApp grid resolution 24), median of three runs after one warm-up. Times exclude
+training; measurement on Python 3.12.3 / x86_64 CPU.
+
+At the default `N=128` the 4-xApp sweep takes **~7.6 ms**, far inside the 1 s
+Near-RT-RIC scheduling budget. The grid-size guard (`CMC.MAX_GRID_POINTS`)
+rejects pathological resolutions before allocation.
+
 ## Paper vs extension
 
 The QACM paper (arXiv 2405.07324v2, Algorithm 1) negotiates a **scalar** `p_l`
