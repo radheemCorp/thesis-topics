@@ -114,8 +114,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
 
 ## Phase 5 — Documentation & Finalization
 
-- [ ] Task: Update usage docs
-  - [ ] Update `docs/usage/RUNNING_CMC.md` (2-D example), `docs/usage/CLI.md` (`--optimize-over`), and `docs/usage/SCENARIOS.md` (now covered by tests).
+- [x] Task: Update usage docs — 59d6e49
+  - [x] Update `docs/usage/RUNNING_CMC.md` (2-D example), `docs/usage/CLI.md` (`--optimize-over`), and `docs/usage/SCENARIOS.md` (now covered by tests).
 - [ ] Task: Document the paper-vs-extension distinction
   - [ ] Add a short note to `docs/usage/RUNNING_CMC.md` and `README.md`: the QACM paper is scalar; joint 2-D follows iter-3 FR-4.6 and is an explicit extension.
 - [ ] Task: Performance benchmark
