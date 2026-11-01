@@ -160,3 +160,28 @@ def test_priority_weight_pulls_p2_towards_app3(synthetic_xapp):
         for earlier, later in zip(distances, distances[1:])
     )
     assert distances[-1] < distances[0]
+
+
+def test_tightening_thresholds_never_increases_satisfied_count(
+    synthetic_xapp,
+):
+    """A stricter QoS threshold cannot raise the number of satisfied xApps."""
+    cmc = CMC(ranges=RANGES, resolution=16)
+
+    satisfied_after = []
+    for threshold in (0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9):
+        pair = [
+            synthetic_xapp("xapp1_direct", qos=threshold),
+            synthetic_xapp("xapp2_direct", qos=threshold),
+        ]
+        result = cmc.mitigate(pair)
+        satisfied_after.append(result.n_satisfied_after)
+        assert result.improved() == (
+            result.n_satisfied_after >= result.n_satisfied_before
+        )
+
+    assert all(
+        later <= earlier
+        for earlier, later in zip(satisfied_after, satisfied_after[1:])
+    )
+    assert satisfied_after[0] > satisfied_after[-1]
