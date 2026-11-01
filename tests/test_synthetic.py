@@ -13,12 +13,16 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from surrogate_xapps.cmc import CMC
 from surrogate_xapps.config import CMSORAN_SPEC
 from surrogate_xapps.data_loader import load_dataset
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SYNTHETIC_DIR = REPO_ROOT / "data" / "synthetic"
 META_PATH = SYNTHETIC_DIR / "synthetic_meta.json"
+
+#: Joint CMC search box shared by every synthetic dataset.
+RANGES = ((-150.0, 50.0), (0.0, 80.0))
 
 #: Expected cmsORAN layout advertised by the metadata file.
 LAYOUT = "cmsORAN (Input1,Input2,Output)"
@@ -74,3 +78,27 @@ def test_dataset_matches_metadata(name: str, meta: dict) -> None:
     )
     assert y[peak_index] == pytest.approx(info["A"], abs=1e-9)
     assert float(np.max(y)) == pytest.approx(info["A"], abs=1e-9)
+
+
+def test_direct_conflict_compromise_lies_between_requests(synthetic_xapp):
+    """app1 vs app2 is a direct 2-D conflict on both ICPs."""
+    xapp1 = synthetic_xapp("xapp1_direct", qos=0.35)
+    xapp2 = synthetic_xapp("xapp2_direct", qos=0.35)
+
+    result = CMC(ranges=RANGES, resolution=16).mitigate([xapp1, xapp2])
+    p1, p2 = result.optimal_point
+
+    request1 = xapp1.preferred_point
+    request2 = xapp2.preferred_point
+    for axis, value in enumerate((p1, p2)):
+        low = min(request1[axis], request2[axis])
+        high = max(request1[axis], request2[axis])
+        assert low <= value <= high
+
+    assert [record["xapp_id"] for record in result.per_xapp] == [
+        "xApp1",
+        "xApp2",
+    ]
+    assert result.n_satisfied_before == 2
+    assert result.n_satisfied_after == 2
+    assert result.improved() is True
