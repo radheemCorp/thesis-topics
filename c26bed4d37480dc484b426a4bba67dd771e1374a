@@ -1,0 +1,38 @@
+Track: Wadud Game-Theoretic Baseline (AM / NSWF / EG)
+
+New conductor track (wadud-baseline_20261101) to implement and evaluate the
+baselines from Wadud, Golpayegani & Afraz, 2311.13389v1, against the existing
+QACM CMC.
+
+Why this paper: it is the direct precursor to QACM and the baseline QACM
+itself benchmarks against. It uses the same substrate as our testbed
+(polynomial surrogates over synthetic Gaussian KPI surfaces, one shared ICP,
+per-conflict MNO priority weights) and needs no simulator or training loop.
+It is therefore the highest-fidelity external comparison available.
+
+Spec highlights:
+- Metrics M1-M13: p*, per-xApp utility u_i, regret du_i, EG welfare and NSWF
+  product, worst-off utility, utility spread, QoS satisfaction count (QACM
+  extension), weighted QoS deviation, concession distance, latency,
+  determinism.
+- Scenarios S1-S9: direct (non-priority + priority), indirect, implicit,
+  four-way scaling, synthetic out-of-sample pair/trio, weight sweep, and
+  edge cases (zero utility, constant KPI, single xApp, zero weights).
+- Reproduction targets from 2311.13389v1 section 5 with explicit tolerance
+  and a mandatory discrepancy_reason when the published p* is not matched.
+- Documented deviations: min-objective utility inversion, NSWF log-space
+  epsilon clamp, EG solved by grid scan rather than an LP, and an open
+  question on dataset provenance (data/QACM data1-5 mapping).
+
+Plan: 4 phases (data provenance/utility -> baselines -> scenario matrix and
+harness -> reporting/docs) with TDD tasks and checkpoints.
+
+Files:
+- conductor/tracks/wadud-baseline_20261101/spec.md
+- conductor/tracks/wadud-baseline_20261101/plan.md
+- conductor/tracks/wadud-baseline_20261101/metadata.json
+- conductor/tracks/wadud-baseline_20261101/index.md
+- conductor/tracks.md
+
+Relates to thesis-proposal/plan/iteration-3/spec.md FR-6.2, FR-6.3, FR-8.2,
+FR-8.4 and acceptance criterion 4.
