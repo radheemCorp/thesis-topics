@@ -1,0 +1,11 @@
+{
+  "track_id": "wadud-baseline_20261101",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-11-01T00:00:00Z",
+  "updated_at": "2026-11-01T00:00:00Z",
+  "description": "Implement and evaluate the AM, NSWF and Eisenberg-Gale conflict-mitigation baselines from Wadud et al. (2311.13389v1) against the existing QACM CMC, on the paper's direct/indirect/implicit scenarios plus synthetic out-of-sample and edge-case scenarios",
+  "baseline_paper": "2311.13389v1",
+  "reference_paper": "2405.07324v2",
+  "thesis_requirements": ["FR-6.2", "FR-6.3", "FR-8.2", "FR-8.4"]
+}

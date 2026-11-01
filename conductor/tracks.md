@@ -16,3 +16,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: CMC Joint 2-D Mitigation**
 *Link: [./cmc-2d_20261025/](./cmc-2d_20261025/)*
+
+---
+
+- [ ] **Track: Wadud Game-Theoretic Baseline (AM / NSWF / EG)**
+*Link: [./wadud-baseline_20261101/](./wadud-baseline_20261101/)*
