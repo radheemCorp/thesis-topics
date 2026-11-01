@@ -1,0 +1,14 @@
+Task: CLI integration tests (Phase 4, cmc-2d_20261025)
+
+Added tests/test_cli.py, an end-to-end suite for cli/cli.py using the real
+synthetic datasets and a 12x12 CMC grid.
+
+- Parametrized 2-, 3-, and 4-app joint runs.
+- Each run must exit 0, print a p* = (p1=..., p2=...) compromise, list every
+  xApp id, and contain no NaN values.
+
+Files:
+- tests/test_cli.py (new)
+
+Why: FR-7 requires automated coverage of the user-facing CLI flow at 2, 3,
+and 4 xApps, including the no-nan regression from Phase 3.
