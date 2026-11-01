@@ -1,0 +1,17 @@
+Task: Document the paper-vs-extension distinction (Phase 5, cmc-2d_20261025)
+
+- README.md gains an implementation-status section that points at
+  surrogate_xapps/ and docs/usage/.
+- RUNNING_CMC.md gains a 'Paper vs extension' section: the QACM paper
+  negotiates a scalar p_l; joint (p1,p2) bargaining follows iteration-3
+  FR-4.6 and is explicitly not paper behaviour.
+- Lists the concrete deviations (Cartesian grid cost, optimize_over,
+  dimension-aware result, lexicographic tie-break, exact_mitigate as oracle)
+  and notes that cost/satisfaction semantics are unchanged.
+
+Files:
+- README.md
+- docs/usage/RUNNING_CMC.md
+
+Why: research-fidelity principle requires every deviation from QACM to be
+documented where readers will see it.
