@@ -18,6 +18,8 @@ usage guides in [`docs/usage/`](docs/usage/):
 - Joint `(p1, p2)` bargaining is an **explicit extension** aligned with
   [`thesis-proposal/plan/iteration-3/spec.md`](thesis-proposal/plan/iteration-3/spec.md)
   FR-4.6 — it is not claimed as QACM paper behaviour.
+- Wadud AM, NSWF, and Eisenberg-Gale scalar baselines are available via
+  [`docs/usage/BASELINES.md`](docs/usage/BASELINES.md).
 
 Start with [Running the CMC](docs/usage/RUNNING_CMC.md) or the
 [scenario CLI](docs/usage/CLI.md).
@@ -100,4 +102,3 @@ bak/                   Exploratory notes and early research directions
 ```
 
 This README is the entry point. The detailed claims, equations, experiment plans, and implementation decisions belong in the linked documents rather than in this overview.
-

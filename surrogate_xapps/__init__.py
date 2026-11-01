@@ -22,6 +22,13 @@ from .config import (
 from .data_loader import load_dataset
 from .surrogates import ANNSurrogate, PolyRegSurrogate, SurrogateModel, build_model
 from .xapps import BaseXApp, CCOxApp, ESxApp, validate_action
+from .baselines import (
+    ArithmeticMeanPolicy,
+    EisenbergGalePolicy,
+    MitigationPolicy,
+    NSWFPolicy,
+)
+from .utility import normalize_utility
 
 __all__ = [
     "CCO_CONFIG",
@@ -41,6 +48,11 @@ __all__ = [
     "CCOxApp",
     "ESxApp",
     "validate_action",
+    "MitigationPolicy",
+    "ArithmeticMeanPolicy",
+    "NSWFPolicy",
+    "EisenbergGalePolicy",
+    "normalize_utility",
 ]
 
 __version__ = "0.1.0"

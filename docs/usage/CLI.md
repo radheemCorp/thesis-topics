@@ -44,6 +44,8 @@ NOT IMPROVED
   fixed at each xApp's preferred value.
 - `--model`: Surrogate backend `ann` or `poly` (default: `ann`)
 - `--resolution`: xApp grid resolution (default: 200)
+- `--method {qacm,am,nswf,eg}`: mitigation selector (default: `qacm`)
+- `--utility-mode {minmax10,zscore}`: utility normalization for NSWF/EG
 
 ## Examples
 

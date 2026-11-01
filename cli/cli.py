@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from surrogate_xapps.cmc import CMC
+from surrogate_xapps.baselines import (
+    ArithmeticMeanPolicy,
+    EisenbergGalePolicy,
+    NSWFPolicy,
+)
 from surrogate_xapps.config import CMSORAN_SPEC, XAppConfig
 from surrogate_xapps.data_loader import load_dataset
 from surrogate_xapps.runner import detect_conflict, print_cmc_report
@@ -46,6 +51,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--model", choices=("ann", "poly"), default="ann")
     p.add_argument("--resolution", type=int, default=200, help="xApp grid resolution")
+    p.add_argument(
+        "--method", choices=("qacm", "am", "nswf", "eg"), default="qacm",
+        help="mitigation policy (default: qacm)",
+    )
+    p.add_argument(
+        "--utility-mode", choices=("minmax10", "zscore"), default="minmax10",
+        help="utility normalization for game-theoretic policies",
+    )
     return p
 
 
@@ -113,7 +126,17 @@ def main(argv: list[str] | None = None) -> int:
     cmc = CMC(
         ranges=ranges, resolution=cmc_resolution, optimize_over=optimize_over
     )
-    mitigation = cmc.mitigate(xapps)
+    if args.method == "qacm":
+        mitigation = cmc.mitigate(xapps)
+    else:
+        policy = {
+            "am": ArithmeticMeanPolicy(),
+            "nswf": NSWFPolicy(utility_mode=args.utility_mode),
+            "eg": EisenbergGalePolicy(utility_mode=args.utility_mode),
+        }[args.method]
+        mitigation = policy.mitigate(
+            xapps, ranges, cmc_resolution, args.weights, optimize_over=optimize_over
+        )
 
     result: dict[str, Any] = {
         "actions": actions,
