@@ -102,3 +102,35 @@ def test_direct_conflict_compromise_lies_between_requests(synthetic_xapp):
     assert result.n_satisfied_before == 2
     assert result.n_satisfied_after == 2
     assert result.improved() is True
+
+
+def test_indirect_conflict_shifts_p2_towards_app3(synthetic_xapp, meta):
+    """Adding app3 moves the p2 compromise toward app3's p2 peak.
+
+    app3's QoS threshold is set at 0.8 so its deviation term is active at the
+    app1/app2 compromise; with looser thresholds app3 is already satisfied
+    everywhere in the shared region and cannot influence the optimum.
+    """
+    pair = [
+        synthetic_xapp("xapp1_direct", qos=0.4),
+        synthetic_xapp("xapp2_direct", qos=0.4),
+    ]
+    app3 = synthetic_xapp("xapp3_indirect", qos=0.8)
+    cmc = CMC(ranges=RANGES, resolution=16)
+
+    two_app = cmc.mitigate(pair)
+    three_app = cmc.mitigate([*pair, app3])
+
+    assert len(three_app.per_xapp) == 3
+    assert [record["xapp_id"] for record in three_app.per_xapp] == [
+        "xApp1",
+        "xApp2",
+        "xApp3",
+    ]
+
+    peak_p2 = float(meta["peaks"]["xapp3_indirect"]["p2c"])
+    p2_two = two_app.optimal_point[1]
+    p2_three = three_app.optimal_point[1]
+
+    assert p2_three != pytest.approx(p2_two, abs=1e-9)
+    assert abs(p2_three - peak_p2) < abs(p2_two - peak_p2)
