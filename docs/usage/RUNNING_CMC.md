@@ -155,5 +155,28 @@ cmc = CMC(ranges=[(-150, 50), (0, 80)], resolution=[64, 128])
 `result.optimal_value` remains available as a deprecated 1-D view of
 `result.optimal_point[0]`.
 
+## Paper vs extension
+
+The QACM paper (arXiv 2405.07324v2, Algorithm 1) negotiates a **scalar** `p_l`
+per detected conflict. This testbed keeps that scalar behaviour for the cmsORAN
+CCO/ES pair and adds joint `(p1, p2)` bargaining as an **explicit extension**,
+aligned with `thesis-proposal/plan/iteration-3/spec.md` FR-4.6. Joint 2-D is not
+claimed as paper behaviour.
+
+Deviations from the paper:
+
+- The candidate set is the Cartesian product of per-axis grids, so the cost is
+  `O(N1·N2·|X'|)` instead of `O(N·|X'|)`.
+- `optimize_over` can restrict the sweep to a subset of ICPs; non-optimized
+  ICPs are held at each xApp's own preferred value.
+- `MitigationResult` is dimension-aware (`optimal_point` plus a deprecated
+  `optimal_value` view).
+- Equal-cost plateaus resolve to the lexicographically smallest point.
+- `exact_mitigate` is a brute-force test oracle only; the production path
+  remains the discrete grid heuristic.
+
+The QACM cost (`Σ_i w_i·d_i·ζ − (Σ_i s_i)^2`), weight normalization,
+deviation direction, and satisfaction semantics are unchanged.
+
 See `surrogate_xapps/cmc.py` for the `CMC`, `MitigationResult`, and
 `IQueryableXApp` definitions.

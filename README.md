@@ -6,6 +6,22 @@ The central question is:
 
 > How can independently developed SON xApps safely share RAN control while preserving their objectives, QoS/SLA requirements, and near-real-time constraints?
 
+## Implementation status — surrogate CMC testbed
+
+The runnable testbed lives under [`surrogate_xapps/`](surrogate_xapps/) with
+usage guides in [`docs/usage/`](docs/usage/):
+
+- CCO and ES surrogate xApps emit conflicting control requests over shared
+  Input Control Parameters.
+- The QACM Conflict Mitigation Controller reproduces the paper's **scalar**
+  `p1` negotiation (arXiv 2405.07324v2, Algorithm 1).
+- Joint `(p1, p2)` bargaining is an **explicit extension** aligned with
+  [`thesis-proposal/plan/iteration-3/spec.md`](thesis-proposal/plan/iteration-3/spec.md)
+  FR-4.6 — it is not claimed as QACM paper behaviour.
+
+Start with [Running the CMC](docs/usage/RUNNING_CMC.md) or the
+[scenario CLI](docs/usage/CLI.md).
+
 ## Repository Index
 
 Use the sections below as a reading path. Start with the problem and system context, compare candidate mitigation strategies, then use the testbed notes to ground an implementation and evaluation.
