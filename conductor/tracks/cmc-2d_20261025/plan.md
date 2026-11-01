@@ -102,7 +102,15 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` complete (append `— <sha>`
   - [x] Write `tests/test_cli.py`: 2-, 3-, and 4-app invocations exit 0, print no `nan`, and print a `(p1, p2)` optimum.
 - [x] Task: Coverage gate — 94% total (cli 92%, cmc 95%, xapps 90%, runner 99%)
   - [x] Run `uv run pytest --cov=surrogate_xapps --cov-report=term-missing`; ensure >80% on `cmc.py`, `xapps.py`, `runner.py`, and `cli/cli.py`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md) [checkpoint: 9370ef0]
+
+### Phase 4 verification report (2026-11-01)
+
+- **Scope:** `dcc9cc9..HEAD` — `tests/conftest.py`, `tests/test_synthetic.py`, `tests/test_cli.py` (test-only; no production code changed).
+- **Tests:** `uv run pytest -o addopts="" -q` → 118 passed (13 new).
+- **Coverage:** 94% total (`cli/cli.py` 92%, `cmc.py` 95%, `xapps.py` 90%, `runner.py` 99%).
+- **Manual checks:** dataset contract pins all four CSV ranges/peaks; direct app1/app2 compromise stays inside the requested bounding box; adding app3 shifts `p2*` from `48.00` to `42.67` toward its `p2=40` peak; priority weights move `p2*` monotonically toward app3; tightening thresholds never raises the satisfied count; 2/3/4-app CLI runs exit 0 with no `nan` and print a `(p1, p2)` optimum.
+- **Deviations:** none.
 
 ## Phase 5 — Documentation & Finalization
 
