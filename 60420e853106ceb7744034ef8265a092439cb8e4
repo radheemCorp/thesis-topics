@@ -1,0 +1,19 @@
+Task: Document ICP semantics and testbed data requirements
+
+Changes:
+- docs/reproduction/ICP-MAPPING-AND-TESTBED-DATA.md explains how both
+  papers describe their inputs, why only p1 is ever named, and what data
+  a real testbed must supply per xApp.
+- Recovered the data1-data5 column-to-p_i mapping from declared ranges
+  and verified it against the published Gaussian formulas (~1e-14).
+- Recorded 14 reproduction blockers (prose/equation contradictions,
+  cross-xApp KPI dependencies, unavailable p2 surfaces, missing control
+  path, missing KPI series, sample-dependent z-score thresholds).
+- Cross-linked from REPORT.md, docs/AGENTS.md and docs/usage/BASELINES.md.
+
+Why:
+- The earlier report treated the xApp/KPI mapping as unknown. Reading the
+  primary PDFs and the shipped CSVs shows the mapping is recoverable, and
+  that most "ICPs" are Gaussian shape coefficients rather than controls.
+
+Files: docs/reproduction/*, docs/AGENTS.md, docs/usage/BASELINES.md
