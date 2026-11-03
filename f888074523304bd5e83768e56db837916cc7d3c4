@@ -1,0 +1,13 @@
+Task: Track baseline evaluation outputs
+
+Changes:
+- Add results/S1-S7 CSV/Markdown plus baselines.csv/md from
+  surrogate_xapps.evaluate.
+- Outputs are the runs cited in docs/reproduction/REPORT.md section 5.
+
+Why:
+- The reproduction report makes negative claims (0 of 10 published points
+  reproduced, all methods tie on satisfaction). The raw outputs must be
+  auditable rather than only summarised in prose.
+
+Files: results/
