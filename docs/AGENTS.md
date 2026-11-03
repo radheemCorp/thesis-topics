@@ -4,6 +4,9 @@ Scope: user-facing documentation, never source of truth for behaviour.
 
 ## Layout
 - `usage/` — CLI, running xApps, running CMC, synthetic datasets, scenarios.
+- `reproduction/` — research-fidelity report, presentation outline, and the
+  ICP-semantics / testbed-data analysis for the Wadud (`2311.13389v1`) vs QACM
+  (`2405.07324v2`) comparison.
 - `synthetic/` — scenario descriptions and generated figures.
 - `visualizations/` — rendered plots (outputs, not inputs).
 

@@ -1,5 +1,9 @@
 # Game-Theoretic Baselines
 
+> Fidelity analysis, reproduction results and the outstanding provenance work are
+> in [`../reproduction/REPORT.md`](../reproduction/REPORT.md). Presentation
+> structure is in [`../reproduction/SLIDES.md`](../reproduction/SLIDES.md).
+
 This track adds the arithmetic mean (AM), Nash Social Welfare (NSWF), and
 Eisenberg-Gale (EG) selectors described by Wadud, Golpayegani & Afraz
 (`2311.13389v1`). They use the same candidate grid and xApp query contract as
