@@ -1,0 +1,18 @@
+Task: Merge the two reproduction reports into one narrative
+
+Changes:
+- REPORT.md now runs problem -> Wadud approach and shortcomings (W1-W12)
+  -> QACM improvements (mechanism, supporting changes, evidence, new vs
+  inherited) -> remaining QACM limits -> datasets -> our data additions
+  -> fidelity results -> reproduced/added/outstanding -> bottom line.
+- Remove docs/reproduction/QACM-IMPROVEMENTS.md; its content is fully
+  merged and no other document linked to it.
+- Keep the W-numbers as stable cross-references from section 2 to the
+  "Addresses" column in section 3.2.
+
+Why:
+- Two files duplicated the mechanism argument and forced readers to jump
+  between them. The thesis comparison needs a single document that shows
+  shortcoming -> response -> remaining gap in one pass.
+
+Files: docs/reproduction/REPORT.md, docs/reproduction/QACM-IMPROVEMENTS.md
